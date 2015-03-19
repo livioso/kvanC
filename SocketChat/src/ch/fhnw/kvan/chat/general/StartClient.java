@@ -11,7 +11,8 @@ import java.lang.reflect.Method;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
-import ch.fhnw.kvan.chat.socket.client.Client;
+// FIXME: Livio 19.03.2015 => Mh, this seems stupid. Not sure if this is part of the task. (?)
+// import ch.fhnw.kvan.chat.socket.client.Client;
 
 /**
  * Class StartClient is used to start the Client side of the chat application. As a
@@ -27,7 +28,7 @@ import ch.fhnw.kvan.chat.socket.client.Client;
  * </pre>
  * 
  * @see Client 
- * @author  © ibneco, Rheinfelden; based on code by Dominik Gruntz
+ * @author  ï¿½ ibneco, Rheinfelden; based on code by Dominik Gruntz
  * @version
  */
 public class StartClient {
