@@ -2,35 +2,41 @@ package ch.fhnw.kvan.chat.socket.client;
 
 import java.io.IOException;
 
-import ch.fhnw.kvan.chat.gui.*;
+import ch.fhnw.kvan.chat.gui.ClientGUI;
+import ch.fhnw.kvan.chat.general.ChatRoomDriver;
 import ch.fhnw.kvan.chat.socket.server.*;
+
+import org.apache.log4j.Logger;
 
 public class Client {
 	
-	static private String host;
-	static private String port;
-	static private String username;
 	static private Server chatRoomServer = new Server();
-	
-	public static void main(String[] args) throws IOException {
-		
-		if(args.length != 3) {
-			System.err.println("Expecting <host> <port> <username>");
-		}
-		
-		host = args[0];
-		port = args[2];
-		username = args[1]; 
-		
-		System.out.println(username);
-		System.out.println(host);
-		System.out.println(port);
+	static private Logger logger = Logger.getLogger(Client.class);
 
-		chatRoomServer.connect(host, 80);
-		
-		ClientGUI client = new ClientGUI(chatRoomServer, username);
-		
-		client.addParticipant(username);
-		
+	public static void main(String[] args) throws IOException {
+
+		try{
+            if(args.length != 3) {
+                logger.error("Expecting <host> <port> <username> parameters. Can not proceed.");
+                return;
+            }
+
+            String username = args[0];
+            String host = args[1];
+            Integer port = Integer.parseInt(args[2]);
+
+            logger.info(username);
+            logger.info(host);
+            logger.info(port);
+
+            ClientGUI client = new ClientGUI((new ChatRoomDriver()).getChatRoom(), username);
+
+            // wow, this is really necessary?
+            client.addParticipant(username);
+
+		} catch(Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
 	}
 }
