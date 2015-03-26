@@ -10,7 +10,7 @@ import ch.fhnw.kvan.chat.interfaces.IChatRoom;
  * current topics and messages concerning those topics.
  * 
  * @see ChatRoom
- * @author © ibneco, Rheinfelden
+ * @author ï¿½ ibneco, Rheinfelden
  * @version
  */
 public class ChatRoom implements IChatRoom {
@@ -30,7 +30,7 @@ public class ChatRoom implements IChatRoom {
 		}
 		return chatRoomInstance;
 	}
-
+	
 	@Override
 	public boolean addParticipant(String name) throws IOException {
 		if (!name.trim().equalsIgnoreCase("")) {

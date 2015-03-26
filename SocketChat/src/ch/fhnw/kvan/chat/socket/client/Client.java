@@ -26,7 +26,7 @@ public class Client {
 		System.out.println(host);
 		System.out.println(port);
 
-		chatRoomServer.connect(host, port);
+		chatRoomServer.connect(host, 80);
 		
 		ClientGUI client = new ClientGUI(chatRoomServer, username);
 		
