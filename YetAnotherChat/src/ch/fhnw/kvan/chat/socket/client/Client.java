@@ -196,7 +196,8 @@ public class Client {
                     clientGui.addTopic(jsonMessage.getString("topic"));
                     break;
 
-                case "new_client":
+                case "remove_topic":
+                    clientGui.removeTopic(jsonMessage.getString("topic"));
                     break;
 
             }
