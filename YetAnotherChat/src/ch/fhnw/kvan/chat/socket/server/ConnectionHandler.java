@@ -15,8 +15,8 @@ import java.net.Socket;
 public class ConnectionHandler implements Runnable {
 
     Socket clientSocket;
-    List<ConnectionHandler> chatPeers;
-    In clientInputStream;
+    private List<ConnectionHandler> chatPeers;
+    private In clientInputStream;
     Out clientOutputStream;
 
     public ConnectionHandler(Socket clientSocket, List<ConnectionHandler> chatPeers) {
@@ -34,9 +34,16 @@ public class ConnectionHandler implements Runnable {
 
         System.out.println("Server is listing for user input.");
 
-        while(clientSocket.isConnected()) {
+        while(true) {
+
+            // FIXME: Close when the pipe is broken.
             String inputString = clientInputStream.readLine();
             System.out.println(inputString);
+
+            for(ConnectionHandler i: chatPeers) {
+                System.out.println(i.clientSocket.getInetAddress());
+                i.clientOutputStream.println(inputString);
+            }
         }
     }
 }

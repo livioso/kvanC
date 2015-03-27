@@ -29,6 +29,8 @@ public class Client {
     ClientChatRoomMessagesSender clientChatRoomMessagesSender
             = new ClientChatRoomMessagesSender();
 
+    ClientChatRoomMessagesReciever clientChatRoomMessagesReciever;
+
     // corresponding gui client instance
     private ClientGUI clientGui;
 
@@ -70,6 +72,8 @@ public class Client {
 
         setupSocketConnection();
         setupClientUserInterface();
+
+        this.clientChatRoomMessagesReciever = new ClientChatRoomMessagesReciever();
     }
 
     private void setupSocketConnection() throws IOException {
@@ -88,7 +92,6 @@ public class Client {
 
         clientGui.addParticipant(username);
     }
-
 
     /**
      * Responsible for the outbound message to the server
@@ -140,16 +143,22 @@ public class Client {
      */
     private class ClientChatRoomMessagesReciever implements Runnable {
 
+        public ClientChatRoomMessagesReciever() {
+            Thread listener = new Thread(this);
+            listener.start();
+        }
+
         @Override
         public void run() {
             listen();
         }
 
         private void listen() {
-            while(clientSocket.isConnected()) {
+            while(true) {
                 // process messages
                 String message = clientInputStream.readLine();
                 clientGui.addTopic(message);
+                logger.info(message);
             }
         }
     }
