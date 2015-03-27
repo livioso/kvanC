@@ -91,9 +91,10 @@ public class Client {
         logger.info("Client connection established.");
     }
 
-    private void setupClientUserInterface() {
+    private void setupClientUserInterface() throws IOException{
         clientGui = new ClientGUI(
                 clientChatRoomMessagesSender, username);
+        clientChatRoomMessagesSender.addParticipant(username);
     }
 
 
@@ -198,6 +199,10 @@ public class Client {
 
                 case "remove_topic":
                     clientGui.removeTopic(jsonMessage.getString("topic"));
+                    break;
+
+                case "new_user":
+                    clientGui.addParticipant(jsonMessage.getString("name"));
                     break;
 
             }

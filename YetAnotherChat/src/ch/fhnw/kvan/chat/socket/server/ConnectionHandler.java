@@ -23,14 +23,14 @@ import java.net.Socket;
  */
 public class ConnectionHandler implements Runnable {
 
+    // FIXME: This really shouldn't be public.
     Socket clientSocket;
     private List<ConnectionHandler> chatPeers;
     private In clientInputStream;
     Out clientOutputStream;
 
-    IChatRoom theChatRoom = ChatRoom.getInstance();
-
-    Logger logger = Logger.getLogger(Server.class);
+    private IChatRoom theChatRoom = ChatRoom.getInstance();
+    private Logger logger = Logger.getLogger(Server.class);
 
     public ConnectionHandler(Socket clientSocket, List<ConnectionHandler> chatPeers) {
 
@@ -90,7 +90,8 @@ public class ConnectionHandler implements Runnable {
                 removeTopic(jsonRecievedMessage);
                 break;
 
-            case "new_client":
+            case "new_user":
+                addNewUser(jsonRecievedMessage);
                 break;
 
         }
@@ -110,6 +111,14 @@ public class ConnectionHandler implements Runnable {
         theChatRoom.removeTopic(removeTopic);
 
         notifyAllChatPeers(removeTopicJsonMessage);
+    }
+
+    private void addNewUser(JsonObject newUserJsonMessage) throws IOException {
+        String newUserName = newUserJsonMessage.getString("name");
+
+        theChatRoom.addParticipant(newUserName);
+
+        notifyAllChatPeers(newUserJsonMessage);
     }
 
     private void notifyAllChatPeers(JsonObject withJsonMessage) {
