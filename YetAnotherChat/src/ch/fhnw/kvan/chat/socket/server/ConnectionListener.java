@@ -51,7 +51,6 @@ public class ConnectionListener implements Runnable {
                 Socket newClientConnection = serverSocket.accept();
                 addNewClientConnection(newClientConnection);
             } catch (IOException e) {
-                // FIXME: Not sure if this is the right way to do it.
                 logger.warn(e.getMessage());
             }
         }
@@ -63,6 +62,8 @@ public class ConnectionListener implements Runnable {
      * @param newClientConnection Socket to the client
      */
     private void addNewClientConnection(Socket newClientConnection) {
-        connections.add(new ConnectionHandler(newClientConnection, connections));
+        ConnectionHandler newClientConnectionHandler =
+                new ConnectionHandler(newClientConnection, connections);
+        connections.add(newClientConnectionHandler);
     }
 }

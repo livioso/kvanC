@@ -1,6 +1,7 @@
 package ch.fhnw.kvan.chat.socket.client;
 
 import javax.json.*;
+
 import ch.fhnw.kvan.chat.interfaces.IChatRoom;
 import ch.fhnw.kvan.chat.utils.In;
 import ch.fhnw.kvan.chat.utils.Out;
@@ -9,6 +10,7 @@ import org.apache.log4j.Logger;
 import ch.fhnw.kvan.chat.gui.ClientGUI;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.Socket;
 
 public class Client {
@@ -26,8 +28,10 @@ public class Client {
     private Out clientOutputStream;
 
     // the client' chat room instance which handles message sending
+    // The setupClientUserInterface() requires this to be initiated
+    // before its call!
     ClientChatRoomMessagesSender clientChatRoomMessagesSender
-            = new ClientChatRoomMessagesSender();
+        = new ClientChatRoomMessagesSender();
 
     ClientChatRoomMessagesReciever clientChatRoomMessagesReciever;
 
@@ -73,6 +77,7 @@ public class Client {
         setupSocketConnection();
         setupClientUserInterface();
 
+        // --> NEEDS TO BE INSTANTIATED AFTER THE SOCKET SETUP!
         this.clientChatRoomMessagesReciever = new ClientChatRoomMessagesReciever();
     }
 
@@ -89,9 +94,9 @@ public class Client {
     private void setupClientUserInterface() {
         clientGui = new ClientGUI(
                 clientChatRoomMessagesSender, username);
-
-        clientGui.addParticipant(username);
     }
+
+
 
     /**
      * Responsible for the outbound message to the server
@@ -101,10 +106,11 @@ public class Client {
         @Override
         public boolean addParticipant(String name) throws IOException {
             JsonObject addParticipantJson = Json.createObjectBuilder()
+                    .add("action", "new_user")
                     .add("name", username).build();
-
             clientOutputStream.println(addParticipantJson.toString());
 
+            clientGui.addParticipant(username);
             return false;
         }
 
@@ -116,16 +122,23 @@ public class Client {
         @Override
         public boolean addTopic(String topic) throws IOException {
             JsonObject addTopicJson = Json.createObjectBuilder()
-                    .add("messageType", "add_topic")
+                    .add("action", "add_topic")
                     .add("topic", topic).build();
-
             clientOutputStream.println(addTopicJson.toString());
+
+            clientGui.addTopic(topic);
             return true;
         }
 
         @Override
         public boolean removeTopic(String topic) throws IOException {
-            return false;
+            JsonObject removeTopicJson = Json.createObjectBuilder()
+                    .add("action", "remove_topic")
+                    .add("topic", topic).build();
+            clientOutputStream.println(removeTopicJson.toString());
+
+            clientGui.removeTopic(topic);
+            return true;
         }
 
         @Override
@@ -145,8 +158,9 @@ public class Client {
     }
 
 
-    /** Responsbile for recieving inbound messages from server
-     *
+
+    /**
+     * Responsible for receiving inbound messages from server
      */
     private class ClientChatRoomMessagesReciever implements Runnable {
 
@@ -161,11 +175,30 @@ public class Client {
         }
 
         private void listen() {
-            while(true) {
-                // process messages
+            while (true) {
                 String message = clientInputStream.readLine();
-                clientGui.addTopic(message);
-                logger.info(message);
+                logger.info("Message received from server: " + message);
+
+                processMessage(message);
+            }
+        }
+
+        private void processMessage(String message) {
+
+            JsonReader jsonReader = Json.createReader(new StringReader(message));
+            JsonObject jsonMessage = jsonReader.readObject();
+
+            final String action = jsonMessage.getString("action");
+
+            switch (action) {
+
+                case "add_topic":
+                    clientGui.addTopic(jsonMessage.getString("topic"));
+                    break;
+
+                case "new_client":
+                    break;
+
             }
         }
     }
