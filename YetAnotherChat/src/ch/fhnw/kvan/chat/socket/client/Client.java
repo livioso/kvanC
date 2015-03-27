@@ -1,9 +1,14 @@
 package ch.fhnw.kvan.chat.socket.client;
 
+import ch.fhnw.kvan.chat.general.ChatRoom;
+import ch.fhnw.kvan.chat.utils.In;
+import ch.fhnw.kvan.chat.utils.Out;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ch.fhnw.kvan.chat.gui.ClientGUI;
-import ch.fhnw.kvan.chat.general.ChatRoomDriver;
+
+import java.io.IOException;
+import java.net.Socket;
 
 public class Client {
 
@@ -14,8 +19,13 @@ public class Client {
     private String hostname;
     private String portnumber;
 
+    // socket and input & output streams
+    private Socket clientSocket;
+    private In clientInputStream;
+    private Out clientOutputStream;
+
     // corresponding gui client instance
-    private ClientGUI clientgui;
+    private ClientGUI clientGui;
 
     public Client(String username, String hostname, String portnumber) throws Exception {
         this.username = username;
@@ -30,11 +40,24 @@ public class Client {
         if (!portnumber.matches("[1-9]{4}")) {
             throw new Exception("Port number is expected to be 4 digit number.");
         }
+
+        setupSocketConnection();
+        setupClientUserInterface();
     }
 
-    public void connectWithServer() {
-        clientgui = new ClientGUI(((new ChatRoomDriver()).getChatRoom()), username);
-        clientgui.addParticipant(username);
+    private void setupSocketConnection() throws IOException {
+        logger.info(username + " trying to connect to " + hostname + " on port " + portnumber);
+        clientSocket = new Socket(hostname, Integer.parseInt(portnumber));
+
+        //clientInputStream = new In(clientSocket);
+        //clientOutputStream = new Out(clientSocket);
+
+        logger.info("Client connection established.");
+    }
+
+    private void setupClientUserInterface() {
+        clientGui = new ClientGUI(ChatRoom.getInstance(), username);
+        clientGui.addParticipant(username);
     }
 
     /**
@@ -52,7 +75,6 @@ public class Client {
 
             // parameter preconditions are checked as well.
             Client aNewClient = new Client(args[0], args[1], args[2]);
-            aNewClient.connectWithServer();
 
         } catch (Exception e) {
             e.printStackTrace();
