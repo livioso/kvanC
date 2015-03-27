@@ -6,6 +6,7 @@ import ch.fhnw.kvan.chat.gui.ClientGUI;
 import ch.fhnw.kvan.chat.general.ChatRoomDriver;
 import ch.fhnw.kvan.chat.socket.server.*;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public class Client {
@@ -14,6 +15,8 @@ public class Client {
 	static private Logger logger = Logger.getLogger(Client.class);
 
 	public static void main(String[] args) throws IOException {
+
+        logger.setLevel(Level.ALL);
 
 		try{
             if(args.length != 3) {
@@ -25,9 +28,9 @@ public class Client {
             String host = args[1];
             Integer port = Integer.parseInt(args[2]);
 
-            logger.info(username);
-            logger.info(host);
-            logger.info(port);
+            logger.info("Username is: " + username);
+            logger.info("Hostname is: " + host);
+            logger.info("Port number is: " + port);
 
             ClientGUI client = new ClientGUI((new ChatRoomDriver()).getChatRoom(), username);
 
