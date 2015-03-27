@@ -1,6 +1,6 @@
 package ch.fhnw.kvan.chat.socket.client;
 
-import ch.fhnw.kvan.chat.general.ChatRoom;
+import javax.json.*;
 import ch.fhnw.kvan.chat.interfaces.IChatRoom;
 import ch.fhnw.kvan.chat.utils.In;
 import ch.fhnw.kvan.chat.utils.Out;
@@ -99,7 +99,10 @@ public class Client {
     private class ClientChatRoomMessagesSender implements IChatRoom {
         @Override
         public boolean addParticipant(String name) throws IOException {
-            clientOutputStream.println("name=");
+            JsonObject addParticipantJson = Json.createObjectBuilder()
+                    .add("name", username).build();
+
+            clientOutputStream.println(addParticipantJson.toString());
 
             return false;
         }
@@ -111,8 +114,10 @@ public class Client {
 
         @Override
         public boolean addTopic(String topic) throws IOException {
-            logger.info(username + " is adding topic " + topic);
-            clientOutputStream.println(topic);
+            JsonObject addTopicJson = Json.createObjectBuilder()
+                    .add("add_topic", topic).build();
+
+            clientOutputStream.println(addTopicJson.toString());
             return true;
         }
 
