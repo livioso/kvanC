@@ -1,10 +1,7 @@
 package ch.fhnw.kvan.chat.socket.client;
 
-import java.io.IOException;
-
 import ch.fhnw.kvan.chat.gui.ClientGUI;
 import ch.fhnw.kvan.chat.general.ChatRoomDriver;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -30,7 +27,7 @@ public class Client {
         logger.info("Hostname is: " + this.hostname);
         logger.info("Port number is: " + this.portnumber);
 
-        if(!portnumber.matches("[1-9]{4}")) {
+        if (!portnumber.matches("[1-9]{4}")) {
             throw new Exception("Port number is expected to be 4 digit number.");
         }
     }
@@ -42,13 +39,14 @@ public class Client {
 
     /**
      * The main method; called via refection from RunClient.
+     *
      * @param args In this order: Hostname Port[4-digits] Username
      */
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
         try {
 
-            if(args.length != 3) {
+            if (args.length != 3) {
                 throw new Exception("Expecting <host> <port> <username> parameters.");
             }
 
@@ -60,5 +58,5 @@ public class Client {
             e.printStackTrace();
             logger.error(e.getMessage());
         }
-	}
+    }
 }
