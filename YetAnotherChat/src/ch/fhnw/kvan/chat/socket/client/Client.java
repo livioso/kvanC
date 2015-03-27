@@ -4,40 +4,59 @@ import java.io.IOException;
 
 import ch.fhnw.kvan.chat.gui.ClientGUI;
 import ch.fhnw.kvan.chat.general.ChatRoomDriver;
-import ch.fhnw.kvan.chat.socket.server.*;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public class Client {
-	
-	static private Server chatRoomServer = new Server();
-	static private Logger logger = Logger.getLogger(Client.class);
 
-	public static void main(String[] args) throws IOException {
+    private static Logger logger = Logger.getLogger(Client.class);
+
+    // connection information
+    private String username;
+    private String hostname;
+    private String portnumber;
+
+    // corresponding gui client instance
+    private ClientGUI clientgui;
+
+    public Client(String username, String hostname, String portnumber) throws Exception {
+        this.username = username;
+        this.hostname = hostname;
+        this.portnumber = portnumber;
 
         logger.setLevel(Level.ALL);
+        logger.info("Username is: " + this.username);
+        logger.info("Hostname is: " + this.hostname);
+        logger.info("Port number is: " + this.portnumber);
 
-		try{
+        if(!portnumber.matches("[1-9]{4}")) {
+            throw new Exception("Port number is expected to be 4 digit number.");
+        }
+    }
+
+    public void connectWithServer() {
+        clientgui = new ClientGUI(((new ChatRoomDriver()).getChatRoom()), username);
+        clientgui.addParticipant(username);
+    }
+
+    /**
+     * The main method; called via refection from RunClient.
+     * @param args In this order: Hostname Port[4-digits] Username
+     */
+	public static void main(String[] args) {
+
+        try {
+
             if(args.length != 3) {
-                logger.error("Expecting <host> <port> <username> parameters. Can not proceed.");
-                return;
+                throw new Exception("Expecting <host> <port> <username> parameters.");
             }
 
-            String username = args[0];
-            String host = args[1];
-            Integer port = Integer.parseInt(args[2]);
+            // parameter preconditions are check as well.
+            Client aNewClient = new Client(args[0], args[1], args[2]);
+            aNewClient.connectWithServer();
 
-            logger.info("Username is: " + username);
-            logger.info("Hostname is: " + host);
-            logger.info("Port number is: " + port);
-
-            ClientGUI client = new ClientGUI((new ChatRoomDriver()).getChatRoom(), username);
-
-            // wow, this is really necessary?
-            client.addParticipant(username);
-
-		} catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
         }
