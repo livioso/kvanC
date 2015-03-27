@@ -11,7 +11,7 @@ import ch.fhnw.kvan.chat.gui.ClientGUI;
 import java.io.IOException;
 import java.net.Socket;
 
-public class Client implements IChatRoom {
+public class Client {
 
     private static Logger logger = Logger.getLogger(Client.class);
 
@@ -24,6 +24,10 @@ public class Client implements IChatRoom {
     private Socket clientSocket;
     private In clientInputStream;
     private Out clientOutputStream;
+
+    // the client' chat room instance which handles message sending
+    ClientChatRoomMessagesSender clientChatRoomMessagesSender
+            = new ClientChatRoomMessagesSender();
 
     // corresponding gui client instance
     private ClientGUI clientGui;
@@ -79,44 +83,74 @@ public class Client implements IChatRoom {
     }
 
     private void setupClientUserInterface() {
-        clientGui = new ClientGUI(this, username);
+        clientGui = new ClientGUI(
+                clientChatRoomMessagesSender, username);
+
         clientGui.addParticipant(username);
     }
 
-    @Override
-    public boolean addParticipant(String name) throws IOException {
-        return false;
+
+    /**
+     * Responsible for the outbound message to the server
+     */
+    private class ClientChatRoomMessagesSender implements IChatRoom {
+        @Override
+        public boolean addParticipant(String name) throws IOException {
+            clientOutputStream.println("name=");
+
+            return false;
+        }
+
+        @Override
+        public boolean removeParticipant(String name) throws IOException {
+            return false;
+        }
+
+        @Override
+        public boolean addTopic(String topic) throws IOException {
+            logger.info(username + " is adding topic " + topic);
+            clientOutputStream.println(topic);
+            return true;
+        }
+
+        @Override
+        public boolean removeTopic(String topic) throws IOException {
+            return false;
+        }
+
+        @Override
+        public boolean addMessage(String topic, String message) throws IOException {
+            return false;
+        }
+
+        @Override
+        public String getMessages(String topic) throws IOException {
+            return null;
+        }
+
+        @Override
+        public String refresh(String topic) throws IOException {
+            return null;
+        }
     }
 
-    @Override
-    public boolean removeParticipant(String name) throws IOException {
-        return false;
-    }
 
-    @Override
-    public boolean addTopic(String topic) throws IOException {
-        logger.info(username + " is adding topic " + topic);
-        clientOutputStream.println(topic);
-        return true;
-    }
+    /** Responsbile for recieving inbound messages from server
+     *
+     */
+    private class ClientChatRoomMessagesReciever implements Runnable {
 
-    @Override
-    public boolean removeTopic(String topic) throws IOException {
-        return false;
-    }
+        @Override
+        public void run() {
+            listen();
+        }
 
-    @Override
-    public boolean addMessage(String topic, String message) throws IOException {
-        return false;
-    }
-
-    @Override
-    public String getMessages(String topic) throws IOException {
-        return null;
-    }
-
-    @Override
-    public String refresh(String topic) throws IOException {
-        return null;
+        private void listen() {
+            while(clientSocket.isConnected()) {
+                // process messages
+                String message = clientInputStream.readLine();
+                clientGui.addTopic(message);
+            }
+        }
     }
 }

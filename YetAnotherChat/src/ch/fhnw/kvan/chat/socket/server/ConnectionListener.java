@@ -63,6 +63,6 @@ public class ConnectionListener implements Runnable {
      * @param newClientConnection Socket to the client
      */
     private void addNewClientConnection(Socket newClientConnection) {
-        connections.add(new ConnectionHandler(newClientConnection));
+        connections.add(new ConnectionHandler(newClientConnection, connections));
     }
 }
