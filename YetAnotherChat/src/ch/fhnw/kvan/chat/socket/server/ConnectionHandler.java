@@ -25,14 +25,14 @@ public class ConnectionHandler implements Runnable {
         this.clientOutputStream = new Out(clientSocket);
         this.clientInputStream = new In(clientSocket);
 
-        Thread me = new Thread(this);
-        me.start();
+        // listens as long as the client is connected
+        // or forcefully quites once the pipe seems broken.
+        Thread clientListener = new Thread(this);
+        clientListener.start();
     }
 
     @Override
     public void run() {
-
-        System.out.println("Server is listing for user input.");
 
         while(true) {
 
@@ -40,6 +40,7 @@ public class ConnectionHandler implements Runnable {
             String inputString = clientInputStream.readLine();
             System.out.println(inputString);
 
+            // FIXME: Review me, it works but is it the way to go?
             for(ConnectionHandler i: chatPeers) {
                 System.out.println(i.clientSocket.getInetAddress());
                 i.clientOutputStream.println(inputString);
