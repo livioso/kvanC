@@ -97,6 +97,7 @@ public class Client {
      * Responsible for the outbound message to the server
      */
     private class ClientChatRoomMessagesSender implements IChatRoom {
+
         @Override
         public boolean addParticipant(String name) throws IOException {
             JsonObject addParticipantJson = Json.createObjectBuilder()
@@ -115,7 +116,8 @@ public class Client {
         @Override
         public boolean addTopic(String topic) throws IOException {
             JsonObject addTopicJson = Json.createObjectBuilder()
-                    .add("add_topic", topic).build();
+                    .add("messageType", "add_topic")
+                    .add("topic", topic).build();
 
             clientOutputStream.println(addTopicJson.toString());
             return true;

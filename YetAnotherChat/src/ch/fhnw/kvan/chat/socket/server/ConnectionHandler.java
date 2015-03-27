@@ -3,6 +3,8 @@ package ch.fhnw.kvan.chat.socket.server;
 import ch.fhnw.kvan.chat.utils.In;
 import ch.fhnw.kvan.chat.utils.Out;
 import java.util.List;
+import javax.json.*;
+import java.io.StringReader;
 
 import java.net.Socket;
 
@@ -34,17 +36,32 @@ public class ConnectionHandler implements Runnable {
     @Override
     public void run() {
 
-        while(true) {
+        // as soon as the pipe is
+        // broken the read line just
+        // gets mambo jumbo messages
+        boolean pipeIsAlive = true;
 
-            // FIXME: Close when the pipe is broken.
-            String inputString = clientInputStream.readLine();
-            System.out.println(inputString);
+        while(pipeIsAlive) {
+
+            String message = clientInputStream.readLine();
+
+            if(message == null) {
+                pipeIsAlive = false;
+            } else {
+                processNewMessage(message);
+            }
+
 
             // FIXME: Review me, it works but is it the way to go?
-            for(ConnectionHandler i: chatPeers) {
-                System.out.println(i.clientSocket.getInetAddress());
-                i.clientOutputStream.println(inputString);
-            }
+            //for(ConnectionHandler i: chatPeers) {
+            //    System.out.println(i.clientSocket.getInetAddress());
+            //    i.clientOutputStream.println(inputString);
+            //}
         }
+    }
+
+    private void processNewMessage(String message) {
+        JsonReader jsonReader = Json.createReader(new StringReader(message));
+        JsonObject jsonMessage = jsonReader.readObject();
     }
 }
