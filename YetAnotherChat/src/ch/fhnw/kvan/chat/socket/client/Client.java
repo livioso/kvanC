@@ -52,7 +52,7 @@ public class Client {
                 throw new Exception("Expecting <host> <port> <username> parameters.");
             }
 
-            // parameter preconditions are check as well.
+            // parameter preconditions are checked as well.
             Client aNewClient = new Client(args[0], args[1], args[2]);
             aNewClient.connectWithServer();
 
