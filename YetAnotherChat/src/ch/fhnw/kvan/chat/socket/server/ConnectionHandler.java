@@ -94,6 +94,14 @@ public class ConnectionHandler implements Runnable {
                 addNewUser(jsonRecievedMessage);
                 break;
 
+            case "remove_user":
+                removeUser(jsonRecievedMessage);
+                break;
+
+            case "add_message":
+                addMessageToTopic(jsonRecievedMessage);
+                break;
+
         }
     }
 
@@ -120,6 +128,25 @@ public class ConnectionHandler implements Runnable {
 
         notifyAllChatPeers(newUserJsonMessage);
     }
+
+    private void removeUser(JsonObject removeUserJsonMessage) throws IOException {
+        String removeUserName = removeUserJsonMessage.getString("name");
+
+        theChatRoom.removeParticipant(removeUserName);
+
+        notifyAllChatPeers(removeUserJsonMessage);
+    }
+
+    private void addMessageToTopic(JsonObject jsonAddMessageToTopic) throws IOException {
+        String topic = jsonAddMessageToTopic.getString("topic");
+        String message = jsonAddMessageToTopic.getString("message");
+
+        theChatRoom.addMessage(topic, message);
+
+        notifyAllChatPeers(jsonAddMessageToTopic);
+    }
+
+
 
     private void notifyAllChatPeers(JsonObject withJsonMessage) {
         // FIXME: Review me, it works but is it the way to go?

@@ -108,16 +108,21 @@ public class Client {
         public boolean addParticipant(String name) throws IOException {
             JsonObject addParticipantJson = Json.createObjectBuilder()
                     .add("action", "new_user")
-                    .add("name", username).build();
+                    .add("name", name).build();
             clientOutputStream.println(addParticipantJson.toString());
 
-            clientGui.addParticipant(username);
-            return false;
+            clientGui.addParticipant(name);
+            return true;
         }
 
         @Override
         public boolean removeParticipant(String name) throws IOException {
-            return false;
+            JsonObject removeParticipantJson = Json.createObjectBuilder()
+                    .add("action", "remove_user")
+                    .add("name", name).build();
+            clientOutputStream.println(removeParticipantJson.toString());
+
+            return true;
         }
 
         @Override
@@ -144,6 +149,13 @@ public class Client {
 
         @Override
         public boolean addMessage(String topic, String message) throws IOException {
+            JsonObject addMessageToTopicJson = Json.createObjectBuilder()
+                    .add("action", "add_message")
+                    .add("message", message)
+                    .add("topic", topic).build();
+            clientOutputStream.println(addMessageToTopicJson.toString());
+
+            clientGui.addMessage(message);
             return false;
         }
 
@@ -205,6 +217,13 @@ public class Client {
                     clientGui.addParticipant(jsonMessage.getString("name"));
                     break;
 
+                case "remove_user":
+                    clientGui.removeParticipant(jsonMessage.getString("name"));
+                    break;
+
+                case "add_message":
+                    clientGui.addMessage(jsonMessage.getString("message"));
+                    break;
             }
         }
     }
