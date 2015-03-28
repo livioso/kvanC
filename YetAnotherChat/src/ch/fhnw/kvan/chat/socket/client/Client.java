@@ -3,52 +3,42 @@ package ch.fhnw.kvan.chat.socket.client;
 import ch.fhnw.kvan.chat.utils.In;
 import ch.fhnw.kvan.chat.utils.Out;
 import ch.fhnw.kvan.chat.gui.ClientGUI;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.Socket;
 
+/**
+ * The Client is responsible for implementing the main
+ * method which is called by RunClient (using reflection).
+ * <p>
+ * The key point to check out here are the two members
+ * messageSender and messagesReceiver which implement
+ * the message handling for sending and respectively
+ * receiving messages from / to the server .
+ */
 public class Client {
 
     private static Logger logger = Logger.getLogger(Client.class);
 
-    // connection information
+    // server connection information
     private String username;
     private String hostname;
     private String portnumber;
 
     // socket and input & output streams
-    private Socket clientSocket;
-    private In clientInputStream;
-    private Out clientOutputStream;
+    private Socket socket;
+    private In inputStream;
+    private Out outputStream;
 
-    ClientMessageSender clientMessageSender;
-    ClientMessageReceiver clientMessagesReceiver;
+    // client message handling
+    ClientMessageSender messageSender;
+    ClientMessageReceiver messagesReceiver;
 
     // corresponding gui client instance
-    private ClientGUI clientGui;
-
-    /**
-     * The main method; called via refection from RunClient.
-     * @param args In this order: [Hostname] [Port[4-digits]] [Username]
-     */
-    public static void main(String[] args) {
-
-        try {
-
-            if (args.length != 3) {
-                throw new Exception("Expecting <host> <port> <username> parameters.");
-            }
-
-            // parameter preconditions are checked as well.
-            new Client(args[0], args[1], args[2]);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-        }
-    }
+    private ClientGUI ui;
 
     public Client(String username, String hostname, String portnumber) throws Exception {
         this.username = username;
@@ -66,26 +56,47 @@ public class Client {
 
         setupSocketAndIOStreams();
 
-        // make sure sockets are set up at this point! We depend on working streams.
-        this.clientMessageSender = new ClientMessageSender(clientOutputStream, username);
-        this.clientGui = new ClientGUI(clientMessageSender, username);
-        this.clientMessagesReceiver = new ClientMessageReceiver(clientInputStream, clientGui);
+        // make sure sockets & streams are set up at this point we depend on working streams.
+        this.messageSender = new ClientMessageSender(outputStream, username);
+        this.ui = new ClientGUI(messageSender, username);
+        this.messagesReceiver = new ClientMessageReceiver(inputStream, ui);
 
         doInitialUserInterfaceUpdate();
     }
 
     private void setupSocketAndIOStreams() throws IOException {
         logger.info(username + " trying to connect to " + hostname + " on port " + portnumber);
-        clientSocket = new Socket(hostname, Integer.parseInt(portnumber));
-        clientInputStream = new In(clientSocket);
-        clientOutputStream = new Out(clientSocket);
+        socket = new Socket(hostname, Integer.parseInt(portnumber));
+        inputStream = new In(socket);
+        outputStream = new Out(socket);
         logger.info("Client connection established.");
     }
 
-    /* Announce client and update ui with existing topics and participants */
+    /**
+     * Announce client and update ui with existing topics and participants
+     */
     private void doInitialUserInterfaceUpdate() throws IOException {
-        clientMessageSender.addParticipant(username); // himself
-        clientMessageSender.getExistingTopics();
-        clientMessageSender.getExistingParticipants();
+        messageSender.addParticipant(username); // announce himself
+        messageSender.getExistingTopics();
+        messageSender.getExistingParticipants();
+    }
+
+    /*
+     * See Client class comment for more information.
+     *
+     * @param args In this order: [Hostname] [Port[4-digits]] [Username]
+     */
+    public static void main(String[] args) {
+        try {
+            if (args.length != 3) {
+                throw new Exception("Expecting <host> <port> <username> parameters.");
+            }
+
+            new Client(args[0], args[1], args[2]); // parameters are checked.
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
     }
 }

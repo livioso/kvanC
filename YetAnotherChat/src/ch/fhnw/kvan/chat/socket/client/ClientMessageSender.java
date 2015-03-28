@@ -2,18 +2,23 @@ package ch.fhnw.kvan.chat.socket.client;
 
 import ch.fhnw.kvan.chat.interfaces.IChatRoom;
 import ch.fhnw.kvan.chat.utils.Out;
+
 import java.io.IOException;
 import javax.json.JsonObject;
 import javax.json.Json;
 
+/**
+ * Responsible for sending outbound messages to the server
+ * using a corresponding client output stream.
+ */
 public class ClientMessageSender implements IChatRoom {
 
-    private String clientUserIdentifier;
-    private Out clientOutputStream;
+    private String username;
+    private Out outputStream;
 
-    public ClientMessageSender(Out clientOutputStream, String clientUserIdentifier) {
-        this.clientOutputStream = clientOutputStream;
-        this.clientUserIdentifier = clientUserIdentifier;
+    public ClientMessageSender(Out outputStream, String username) {
+        this.outputStream = outputStream;
+        this.username = username;
     }
 
     @Override
@@ -21,7 +26,7 @@ public class ClientMessageSender implements IChatRoom {
         JsonObject addParticipantJson = Json.createObjectBuilder()
                 .add("action", "new_user")
                 .add("name", name).build();
-        clientOutputStream.println(addParticipantJson.toString());
+        outputStream.println(addParticipantJson);
         return true;
     }
 
@@ -30,7 +35,7 @@ public class ClientMessageSender implements IChatRoom {
         JsonObject removeParticipantJson = Json.createObjectBuilder()
                 .add("action", "remove_user")
                 .add("name", name).build();
-        clientOutputStream.println(removeParticipantJson.toString());
+        outputStream.println(removeParticipantJson);
         return true;
     }
 
@@ -39,7 +44,7 @@ public class ClientMessageSender implements IChatRoom {
         JsonObject addTopicJson = Json.createObjectBuilder()
                 .add("action", "add_topic")
                 .add("topic", topic).build();
-        clientOutputStream.println(addTopicJson.toString());
+        outputStream.println(addTopicJson);
         return true;
     }
 
@@ -48,7 +53,7 @@ public class ClientMessageSender implements IChatRoom {
         JsonObject removeTopicJson = Json.createObjectBuilder()
                 .add("action", "remove_topic")
                 .add("topic", topic).build();
-        clientOutputStream.println(removeTopicJson.toString());
+        outputStream.println(removeTopicJson);
         return true;
     }
 
@@ -56,9 +61,9 @@ public class ClientMessageSender implements IChatRoom {
     public boolean addMessage(String topic, String message) throws IOException {
         JsonObject addMessageToTopicJson = Json.createObjectBuilder()
                 .add("action", "add_message")
-                .add("message", clientUserIdentifier + ": " + message)
+                .add("message", username + ": " + message)
                 .add("topic", topic).build();
-        clientOutputStream.println(addMessageToTopicJson.toString());
+        outputStream.println(addMessageToTopicJson);
         return true;
     }
 
@@ -67,7 +72,7 @@ public class ClientMessageSender implements IChatRoom {
         JsonObject getMessagesFromTopicJson = Json.createObjectBuilder()
                 .add("action", "get_latest_messages")
                 .add("topic", topic).build();
-        clientOutputStream.println(getMessagesFromTopicJson.toString());
+        outputStream.println(getMessagesFromTopicJson);
         return "";
     }
 
@@ -76,15 +81,15 @@ public class ClientMessageSender implements IChatRoom {
         return getMessages(topic);
     }
 
-    public void getExistingTopics () {
+    public void getExistingTopics() {
         JsonObject getTopicsJson = Json.createObjectBuilder()
                 .add("action", "get_topics").build();
-        clientOutputStream.println(getTopicsJson.toString());
+        outputStream.println(getTopicsJson);
     }
 
     public void getExistingParticipants() {
         JsonObject getParticipantsJson = Json.createObjectBuilder()
                 .add("action", "get_participants").build();
-        clientOutputStream.println(getParticipantsJson.toString());
+        outputStream.println(getParticipantsJson);
     }
 }

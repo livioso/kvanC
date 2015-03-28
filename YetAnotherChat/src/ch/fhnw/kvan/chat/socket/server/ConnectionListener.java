@@ -24,7 +24,7 @@ public class ConnectionListener implements Runnable {
     /**
      * Thread-safe list with all the connections to clients
      */
-    private List<ConnectionHandler> connections =
+    private List<ConnectionHandler> chatClients =
             Collections.synchronizedList(new ArrayList<>());
 
     public ConnectionListener(ServerSocket serverSocket) {
@@ -34,20 +34,12 @@ public class ConnectionListener implements Runnable {
 
     @Override
     public void run() {
-        listen();
-    }
-
-    /**
-     * Listen for new incoming connections.
-     */
-    private void listen() {
-
         logger.info("Listing on port " + serverSocket.getLocalPort());
 
         while (true) {
             try {
-                Socket newClientConnection = serverSocket.accept();
-                addNewClientConnection(newClientConnection);
+                Socket incomingSocket = serverSocket.accept();
+                addNewClientSocket(incomingSocket);
             } catch (IOException e) {
                 logger.warn(e.getMessage());
             }
@@ -55,13 +47,13 @@ public class ConnectionListener implements Runnable {
     }
 
     /**
-     * Adds a new client connection to the connections collection.
+     * Adds a new client connection to the chatClients collection.
      *
-     * @param newClientConnection Socket to the client
+     * @param incomingSocket Socket to the client
      */
-    private void addNewClientConnection(Socket newClientConnection) {
+    private void addNewClientSocket(Socket incomingSocket) {
         ConnectionHandler newClientConnectionHandler =
-                new ConnectionHandler(newClientConnection, connections);
-        connections.add(newClientConnectionHandler);
+                new ConnectionHandler(incomingSocket, chatClients);
+        chatClients.add(newClientConnectionHandler);
     }
 }

@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 public class Server {
 
     /**
-     * Server listens on this port for clients.
+     * Server listens on this port for clients
      */
     private static final int LISTING_PORT = 1235;
 

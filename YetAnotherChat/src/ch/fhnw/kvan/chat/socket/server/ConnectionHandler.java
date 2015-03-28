@@ -3,39 +3,37 @@ package ch.fhnw.kvan.chat.socket.server;
 import ch.fhnw.kvan.chat.general.ChatRoom;
 import ch.fhnw.kvan.chat.utils.In;
 import ch.fhnw.kvan.chat.utils.Out;
+
 import java.io.IOException;
-import java.util.List;
-import javax.json.*;
+import java.net.Socket;
 import java.io.StringReader;
+import java.util.List;
+import javax.json.JsonReader;
+import javax.json.JsonObject;
+import javax.json.Json;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import java.net.Socket;
 
 /**
- * This thread is responsible for listing to one
- * particular client for changes.
- * <p>
- * Created by livio on 27/03/15.
+ * ConnectionHandler is responsible for listing for
+ * requests by one particular client. Each client gets
+ * its own connection handler.
  */
 public class ConnectionHandler implements Runnable {
 
-    // FIXME: This really shouldn't be public.
-    private Socket clientSocket;
-    private List<ConnectionHandler> chatPeers;
-    private In clientInputStream;
-    private Out clientOutputStream;
-
-    private ChatRoom theChatRoom = ChatRoom.getInstance();
     private Logger logger = Logger.getLogger(Server.class);
+    private List<ConnectionHandler> chatClients;
+    private In inputStream;
+    private Out outputStream;
+    private ChatRoom theChatRoom = ChatRoom.getInstance();
 
-    public ConnectionHandler(Socket clientSocket, List<ConnectionHandler> chatPeers) {
-
+    public ConnectionHandler(Socket incomingSocket, List<ConnectionHandler> chatClients) {
         logger.setLevel(Level.ALL);
 
-        this.clientSocket = clientSocket;
-        this.chatPeers = chatPeers;
-        this.clientOutputStream = new Out(clientSocket);
-        this.clientInputStream = new In(clientSocket);
+        this.chatClients = chatClients;
+        this.outputStream = new Out(incomingSocket);
+        this.inputStream = new In(incomingSocket);
 
         // listens as long as the client is connected
         // or forcefully quites once the pipe seems broken.
@@ -46,82 +44,77 @@ public class ConnectionHandler implements Runnable {
     @Override
     public void run() {
 
-        // as soon as the pipe is
-        // broken the read line just
-        // gets mambo jumbo messages
-        boolean pipeIsAlive = true;
-
-        while (pipeIsAlive) {
-
-            String messageFromClient = clientInputStream.readLine();
+        while (true) {
+            String messageFromClient = inputStream.readLine();
 
             if (messageFromClient == null) {
-                pipeIsAlive = false;
+                logger.error("Pipe is broken: Disconnecting.");
+                break;
             }
 
             try {
-                processMessage(messageFromClient);
-            } catch (Exception e) {
-                logger.warn("Message processing failed. "
-                        + "Reason for error: " + e.getMessage());
+                dispatchMessage(messageFromClient);
+            } catch (IOException e) {
+                logger.warn(e.getMessage());
             }
         }
     }
 
-    private void processMessage(String recievedMessage) throws IOException {
+    /**
+     * Processes a new received message from the client.
+     *
+     * @param message Format send by client {"action:" _, "key": "value", ... }
+     */
+    private void dispatchMessage(String message) throws IOException {
+        JsonReader jsonReader = Json.createReader(new StringReader(message));
+        JsonObject jsonMessage = jsonReader.readObject();
 
-        JsonReader jsonReader = Json.createReader(
-                new StringReader(recievedMessage));
-        JsonObject jsonRecievedMessage = jsonReader.readObject();
-
-        final String action = jsonRecievedMessage.getString("action");
+        final String action = jsonMessage.getString("action");
 
         switch (action) {
 
             case "add_topic":
-                addTopic(jsonRecievedMessage);
+                addTopic(jsonMessage);
                 break;
 
             case "remove_topic":
-                removeTopic(jsonRecievedMessage);
+                removeTopic(jsonMessage);
                 break;
 
             case "new_user":
-                addNewUser(jsonRecievedMessage);
+                addNewUser(jsonMessage);
                 break;
 
             case "remove_user":
-                removeUser(jsonRecievedMessage);
+                removeUser(jsonMessage);
                 break;
 
             case "add_message":
-                addMessageToTopic(jsonRecievedMessage);
+                addMessageToTopic(jsonMessage);
                 break;
 
             case "get_latest_messages":
-                getLatestMessages(jsonRecievedMessage);
+                getLatestMessages(jsonMessage);
                 break;
 
             case "get_topics":
-                getTopics(jsonRecievedMessage);
+                getTopics(jsonMessage);
                 break;
 
             case "get_participants":
-                getParticipants(jsonRecievedMessage);
+                getParticipants(jsonMessage);
                 break;
         }
 
-        // notify all the chat peers.
-        // for messages they don't care there
-        // is simply not message handler implemented
-        notifyAllChatPeers(jsonRecievedMessage);
+        // --> send notifcation to all clients.
+        sendMessageToAllClients(jsonMessage);
     }
 
-    private void notifyAllChatPeers(JsonObject withJsonMessage) {
-        logger.info("Notify all clients -> Message : " + withJsonMessage);
+    private void sendMessageToAllClients(JsonObject withMessage) {
+        logger.info("Notify all clients -> Message : " + withMessage);
 
-        for (ConnectionHandler each : chatPeers) {
-            each.clientOutputStream.println(withJsonMessage);
+        for (ConnectionHandler each : chatClients) {
+            each.outputStream.println(withMessage);
         }
     }
 
@@ -161,23 +154,31 @@ public class ConnectionHandler implements Runnable {
         String responseMessages = theChatRoom.getMessages(topic);
         responseMessages = responseMessages.replaceFirst("messages=", "");
 
+        if (responseMessages.isEmpty()) {
+            return; // it's fine to not send anything / client struggles with ""
+        }
+
         JsonObject replyLatestMessagesFromTopicJson = Json.createObjectBuilder()
                 .add("action", "response_latest_messages")
                 .add("messages", responseMessages).build();
-        clientOutputStream.println(replyLatestMessagesFromTopicJson);
+        outputStream.println(replyLatestMessagesFromTopicJson);
     }
 
     private void getTopics(JsonObject jsonGetTopics) throws IOException {
         String responseAllTopics = theChatRoom.getTopics();
         responseAllTopics = responseAllTopics.replaceFirst("topics=", "");
 
+        if (responseAllTopics.isEmpty()) {
+            return; // it's fine to not send anything / client struggles with ""
+        }
+
         // there is a trailing ; at the very end of the string => not needed
-        responseAllTopics = responseAllTopics.substring(0, responseAllTopics.length()-1);
+        responseAllTopics = responseAllTopics.substring(0, responseAllTopics.length() - 1);
 
         JsonObject replyTopicsJson = Json.createObjectBuilder()
                 .add("action", "response_all_topics")
                 .add("topics", responseAllTopics).build();
-        clientOutputStream.println(replyTopicsJson);
+        outputStream.println(replyTopicsJson);
     }
 
     private void getParticipants(JsonObject jsonGetParticipants) throws IOException {
@@ -185,11 +186,13 @@ public class ConnectionHandler implements Runnable {
         responseParticipants = responseParticipants.replaceFirst("participants=", "");
 
         // there is a trailing ; at the very end of the string => not needed
-        responseParticipants = responseParticipants.substring(0, responseParticipants.length()-1);
+        if (!responseParticipants.isEmpty()) {
+            responseParticipants = responseParticipants.substring(0, responseParticipants.length() - 1);
+        }
 
         JsonObject replyTopicsJson = Json.createObjectBuilder()
                 .add("action", "response_all_participants")
                 .add("participants", responseParticipants).build();
-        clientOutputStream.println(replyTopicsJson);
+        outputStream.println(replyTopicsJson);
     }
 }
