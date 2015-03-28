@@ -24,12 +24,12 @@ import java.net.Socket;
 public class ConnectionHandler implements Runnable {
 
     // FIXME: This really shouldn't be public.
-    Socket clientSocket;
+    private Socket clientSocket;
     private List<ConnectionHandler> chatPeers;
     private In clientInputStream;
-    Out clientOutputStream;
+    private Out clientOutputStream;
 
-    private IChatRoom theChatRoom = ChatRoom.getInstance();
+    private ChatRoom theChatRoom = ChatRoom.getInstance();
     private Logger logger = Logger.getLogger(Server.class);
 
     public ConnectionHandler(Socket clientSocket, List<ConnectionHandler> chatPeers) {
@@ -102,39 +102,44 @@ public class ConnectionHandler implements Runnable {
                 addMessageToTopic(jsonRecievedMessage);
                 break;
 
+            case "get_latest_messages":
+                getLatestMessages(jsonRecievedMessage);
+                break;
+
+            case "get_topics":
+                getTopics(jsonRecievedMessage);
+                break;
+
         }
+
+        // notify all the chat peers.
+        // for messages they don't care there
+        // is simply not message handler implemented
+        notifyAllChatPeers(jsonRecievedMessage);
     }
 
     private void addTopic(JsonObject addTopicJsonMessage) throws IOException {
         String newTopic = addTopicJsonMessage.getString("topic");
 
         theChatRoom.addTopic(newTopic);
-
-        notifyAllChatPeers(addTopicJsonMessage);
     }
 
     private void removeTopic(JsonObject removeTopicJsonMessage) throws IOException {
         String removeTopic = removeTopicJsonMessage.getString("topic");
 
         theChatRoom.removeTopic(removeTopic);
-
-        notifyAllChatPeers(removeTopicJsonMessage);
     }
 
     private void addNewUser(JsonObject newUserJsonMessage) throws IOException {
         String newUserName = newUserJsonMessage.getString("name");
 
         theChatRoom.addParticipant(newUserName);
-
-        notifyAllChatPeers(newUserJsonMessage);
     }
 
     private void removeUser(JsonObject removeUserJsonMessage) throws IOException {
         String removeUserName = removeUserJsonMessage.getString("name");
 
         theChatRoom.removeParticipant(removeUserName);
-
-        notifyAllChatPeers(removeUserJsonMessage);
     }
 
     private void addMessageToTopic(JsonObject jsonAddMessageToTopic) throws IOException {
@@ -142,22 +147,41 @@ public class ConnectionHandler implements Runnable {
         String message = jsonAddMessageToTopic.getString("message");
 
         theChatRoom.addMessage(topic, message);
+    }
 
-        notifyAllChatPeers(jsonAddMessageToTopic);
+    private void getLatestMessages(JsonObject jsonAddMessageToTopic) throws IOException {
+        String topic = jsonAddMessageToTopic.getString("topic");
+        String responseMessages = theChatRoom.getMessages(topic);
+        responseMessages = responseMessages.replaceFirst("messages=", "");
+
+        JsonObject replyLatestMessagesFromTopicJson = Json.createObjectBuilder()
+                .add("action", "response_latest_messages")
+                .add("messages", responseMessages).build();
+        clientOutputStream.println(replyLatestMessagesFromTopicJson);
+    }
+
+    private void getTopics(JsonObject jsonGetTopics) throws IOException {
+        String responseAllTopics = theChatRoom.getTopics();
+        responseAllTopics = responseAllTopics.replaceFirst("topics=", "");
+
+        // there is a trailing ; at the very end of the string => not needed
+        responseAllTopics = responseAllTopics.substring(0, responseAllTopics.length()-1);
+
+        JsonObject replyTopicsJson = Json.createObjectBuilder()
+                .add("action", "response_all_topics")
+                .add("topics", responseAllTopics).build();
+        clientOutputStream.println(replyTopicsJson);
     }
 
 
+        private void notifyAllChatPeers(JsonObject withJsonMessage) {
+        logger.info("Sending message to clients: " + withJsonMessage);
 
-    private void notifyAllChatPeers(JsonObject withJsonMessage) {
-        // FIXME: Review me, it works but is it the way to go?
         for (ConnectionHandler each : chatPeers) {
 
             if (each == this) {
                 continue;
             }
-
-            logger.info("Sending message " + withJsonMessage
-                    + " to " + each.clientSocket.getLocalPort());
 
             each.clientOutputStream.println(withJsonMessage);
         }

@@ -29,11 +29,9 @@ public class Client {
 
     // the client' chat room instance which handles message sending
     // The setupClientUserInterface() requires this to be initiated
-    // before its call!
-    ClientChatRoomMessagesSender clientChatRoomMessagesSender
-        = new ClientChatRoomMessagesSender();
+    ClientMessageSender clientMessageSender = new ClientMessageSender();
 
-    ClientChatRoomMessagesReciever clientChatRoomMessagesReciever;
+    ClientMessageReceiver clientMessagesReceiver;
 
     // corresponding gui client instance
     private ClientGUI clientGui;
@@ -52,7 +50,7 @@ public class Client {
             }
 
             // parameter preconditions are checked as well.
-            Client aNewClient = new Client(args[0], args[1], args[2]);
+            new Client(args[0], args[1], args[2]);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,7 +76,7 @@ public class Client {
         setupClientUserInterface();
 
         // --> NEEDS TO BE INSTANTIATED AFTER THE SOCKET SETUP!
-        this.clientChatRoomMessagesReciever = new ClientChatRoomMessagesReciever();
+        this.clientMessagesReceiver = new ClientMessageReceiver();
     }
 
     private void setupSocketConnection() throws IOException {
@@ -92,17 +90,15 @@ public class Client {
     }
 
     private void setupClientUserInterface() throws IOException{
-        clientGui = new ClientGUI(
-                clientChatRoomMessagesSender, username);
-        clientChatRoomMessagesSender.addParticipant(username);
+        clientGui = new ClientGUI(clientMessageSender, username);
+        clientMessageSender.addParticipant(username);
+        clientMessageSender.getExistingTopics();
     }
-
-
 
     /**
      * Responsible for the outbound message to the server
      */
-    private class ClientChatRoomMessagesSender implements IChatRoom {
+    private class ClientMessageSender implements IChatRoom {
 
         @Override
         public boolean addParticipant(String name) throws IOException {
@@ -121,7 +117,6 @@ public class Client {
                     .add("action", "remove_user")
                     .add("name", name).build();
             clientOutputStream.println(removeParticipantJson.toString());
-
             return true;
         }
 
@@ -151,33 +146,41 @@ public class Client {
         public boolean addMessage(String topic, String message) throws IOException {
             JsonObject addMessageToTopicJson = Json.createObjectBuilder()
                     .add("action", "add_message")
-                    .add("message", message)
+                    .add("message", username + ": " + message)
                     .add("topic", topic).build();
             clientOutputStream.println(addMessageToTopicJson.toString());
 
-            clientGui.addMessage(message);
-            return false;
+            clientGui.addMessage(username + ": " + message);
+            return true;
         }
 
         @Override
         public String getMessages(String topic) throws IOException {
-            return null;
+            JsonObject getMessagesFromTopicJson = Json.createObjectBuilder()
+                    .add("action", "get_latest_messages")
+                    .add("topic", topic).build();
+            clientOutputStream.println(getMessagesFromTopicJson.toString());
+            return "";
         }
 
         @Override
         public String refresh(String topic) throws IOException {
-            return null;
+            return getMessages(topic);
+        }
+
+        public void getExistingTopics () {
+            JsonObject getMessagesFromTopicJson = Json.createObjectBuilder()
+                    .add("action", "get_topics").build();
+            clientOutputStream.println(getMessagesFromTopicJson.toString());
         }
     }
-
-
 
     /**
      * Responsible for receiving inbound messages from server
      */
-    private class ClientChatRoomMessagesReciever implements Runnable {
+    private class ClientMessageReceiver implements Runnable {
 
-        public ClientChatRoomMessagesReciever() {
+        public ClientMessageReceiver() {
             Thread listener = new Thread(this);
             listener.start();
         }
@@ -191,7 +194,6 @@ public class Client {
             while (true) {
                 String message = clientInputStream.readLine();
                 logger.info("Message received from server: " + message);
-
                 processMessage(message);
             }
         }
@@ -224,6 +226,14 @@ public class Client {
                 case "add_message":
                     clientGui.addMessage(jsonMessage.getString("message"));
                     break;
+
+                case "response_latest_messages":
+                    String latestMessages = jsonMessage.getString("messages");
+                    clientGui.updateMessages(latestMessages.split(";;"));
+
+                case "response_all_topics":
+                    String allTopics = jsonMessage.getString("topics");
+                    clientGui.updateTopics(allTopics.split(";;"));
             }
         }
     }
