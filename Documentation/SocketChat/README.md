@@ -36,6 +36,10 @@ The server can send the following messages to the client (this are replies to cl
 -  Added Message: `{"action":"add_message","message":"hi","topic":"whatever"}`
 
 ##### Notification to single Client:
--  Response Latest Messages: `{"action":"response_latest_messages","messages":"message2;message1"}`
--  Response All Topics: `{"action":"response_all_topics","topics":"topic1;topic2"}`
--  Response All Participants: `{"action":"response_all_participants","participants":"alice;bob"}`
+-  Response Latest Messages: *The client initially needs to know the latests messages*
+	- `{"action":"response_latest_messages","messages":"message2;message1"}`
+  
+-  Response All Topics: *The client initially needs to know topics*
+	- `{"action":"response_all_topics","topics":"topic1;topic2"}`
+-  Response All Participants: *The client initially needs to know the participants*
+	-  `{"action":"response_all_participants","participants":"alice;bob"}`
