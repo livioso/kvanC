@@ -9,9 +9,11 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ch.fhnw.kvan.chat.gui.ClientGUI;
 
+import java.util.Arrays;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.Socket;
+import java.util.Collections;
 
 public class Client {
 
@@ -91,8 +93,9 @@ public class Client {
 
     private void setupClientUserInterface() throws IOException{
         clientGui = new ClientGUI(clientMessageSender, username);
-        clientMessageSender.addParticipant(username);
+        clientMessageSender.addParticipant(username); // himself
         clientMessageSender.getExistingTopics();
+        clientMessageSender.getExistingParticipants();
     }
 
     /**
@@ -169,9 +172,15 @@ public class Client {
         }
 
         public void getExistingTopics () {
-            JsonObject getMessagesFromTopicJson = Json.createObjectBuilder()
+            JsonObject getTopicsJson = Json.createObjectBuilder()
                     .add("action", "get_topics").build();
-            clientOutputStream.println(getMessagesFromTopicJson.toString());
+            clientOutputStream.println(getTopicsJson.toString());
+        }
+
+        public void getExistingParticipants() {
+            JsonObject getParticipantsJson = Json.createObjectBuilder()
+                    .add("action", "get_participants").build();
+            clientOutputStream.println(getParticipantsJson.toString());
         }
     }
 
@@ -187,10 +196,6 @@ public class Client {
 
         @Override
         public void run() {
-            listen();
-        }
-
-        private void listen() {
             while (true) {
                 String message = clientInputStream.readLine();
                 logger.info("Message received from server: " + message);
@@ -229,11 +234,21 @@ public class Client {
 
                 case "response_latest_messages":
                     String latestMessages = jsonMessage.getString("messages");
-                    clientGui.updateMessages(latestMessages.split(";;"));
+                    // we need to reverse the messages (so we have oldest->newest)
+                    String[] messages = latestMessages.split(";;");
+                    Collections.reverse(Arrays.asList(messages));
+                    clientGui.updateMessages(messages);
+                    break;
 
                 case "response_all_topics":
                     String allTopics = jsonMessage.getString("topics");
-                    clientGui.updateTopics(allTopics.split(";;"));
+                    clientGui.updateTopics(allTopics.split(";"));
+                    break;
+
+                case "response_all_participants":
+                    String allParticipants = jsonMessage.getString("participants");
+                    clientGui.updateParticipants(allParticipants.split(";"));
+                    break;
             }
         }
     }

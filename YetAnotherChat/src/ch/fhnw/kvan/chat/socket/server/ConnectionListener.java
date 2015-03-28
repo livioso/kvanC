@@ -1,7 +1,5 @@
 package ch.fhnw.kvan.chat.socket.server;
 
-import ch.fhnw.kvan.chat.interfaces.IChatRoom;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;

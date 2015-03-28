@@ -1,18 +1,14 @@
 package ch.fhnw.kvan.chat.socket.server;
 
 import ch.fhnw.kvan.chat.general.ChatRoom;
-import ch.fhnw.kvan.chat.interfaces.IChatRoom;
 import ch.fhnw.kvan.chat.utils.In;
 import ch.fhnw.kvan.chat.utils.Out;
-
 import java.io.IOException;
 import java.util.List;
 import javax.json.*;
 import java.io.StringReader;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import java.net.Socket;
 
 /**
@@ -110,12 +106,28 @@ public class ConnectionHandler implements Runnable {
                 getTopics(jsonRecievedMessage);
                 break;
 
+            case "get_participants":
+                getParticipants(jsonRecievedMessage);
+                break;
         }
 
         // notify all the chat peers.
         // for messages they don't care there
         // is simply not message handler implemented
         notifyAllChatPeers(jsonRecievedMessage);
+    }
+
+    private void notifyAllChatPeers(JsonObject withJsonMessage) {
+        logger.info("Sending message to clients: " + withJsonMessage);
+
+        for (ConnectionHandler each : chatPeers) {
+
+            if (each == this) {
+                continue;
+            }
+
+            each.clientOutputStream.println(withJsonMessage);
+        }
     }
 
     private void addTopic(JsonObject addTopicJsonMessage) throws IOException {
@@ -173,17 +185,16 @@ public class ConnectionHandler implements Runnable {
         clientOutputStream.println(replyTopicsJson);
     }
 
+    private void getParticipants(JsonObject jsonGetParticipants) throws IOException {
+        String responseParticipants = theChatRoom.getParticipants();
+        responseParticipants = responseParticipants.replaceFirst("participants=", "");
 
-        private void notifyAllChatPeers(JsonObject withJsonMessage) {
-        logger.info("Sending message to clients: " + withJsonMessage);
+        // there is a trailing ; at the very end of the string => not needed
+        responseParticipants = responseParticipants.substring(0, responseParticipants.length()-1);
 
-        for (ConnectionHandler each : chatPeers) {
-
-            if (each == this) {
-                continue;
-            }
-
-            each.clientOutputStream.println(withJsonMessage);
-        }
+        JsonObject replyTopicsJson = Json.createObjectBuilder()
+                .add("action", "response_all_participants")
+                .add("participants", responseParticipants).build();
+        clientOutputStream.println(replyTopicsJson);
     }
 }
