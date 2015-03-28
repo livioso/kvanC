@@ -153,10 +153,6 @@ public class ConnectionHandler implements Runnable {
         String responseMessages = theChatRoom.getMessages(topic);
         responseMessages = responseMessages.replaceFirst("messages=", "");
 
-        if (responseMessages.isEmpty()) {
-            return; // it's fine to not send anything / client struggles with ""
-        }
-
         JsonObject replyLatestMessagesFromTopicJson = Json.createObjectBuilder()
                 .add("action", "response_latest_messages")
                 .add("messages", responseMessages).build();
