@@ -2,9 +2,12 @@
 
 ##### Author: Livio Bieri, March 2015
 
+#### User Interface
+![UI](assets/Screenshot-I.png)
+
 #### Overview
 
-![Overview](./assets/Communication.pdf)
+![Overview](assets/Communication.pdf)
 
 **Description:**
 
