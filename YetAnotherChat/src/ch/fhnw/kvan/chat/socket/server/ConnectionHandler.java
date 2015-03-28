@@ -118,14 +118,9 @@ public class ConnectionHandler implements Runnable {
     }
 
     private void notifyAllChatPeers(JsonObject withJsonMessage) {
-        logger.info("Sending message to clients: " + withJsonMessage);
+        logger.info("Notify all clients -> Message : " + withJsonMessage);
 
         for (ConnectionHandler each : chatPeers) {
-
-            if (each == this) {
-                continue;
-            }
-
             each.clientOutputStream.println(withJsonMessage);
         }
     }
