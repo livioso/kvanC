@@ -185,9 +185,9 @@ public class ConnectionHandler implements Runnable {
             responseParticipants = responseParticipants.substring(0, responseParticipants.length() - 1);
         }
 
-        JsonObject replyTopicsJson = Json.createObjectBuilder()
+        JsonObject replyParticipantsJson = Json.createObjectBuilder()
                 .add("action", "response_all_participants")
                 .add("participants", responseParticipants).build();
-        outputStream.println(replyTopicsJson);
+        outputStream.println(replyParticipantsJson);
     }
 }
