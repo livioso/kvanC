@@ -1,9 +1,8 @@
 package ch.fhnw.kvan.chat.socket.client;
 
+import ch.fhnw.kvan.chat.gui.ClientGUI;
 import ch.fhnw.kvan.chat.utils.In;
 import ch.fhnw.kvan.chat.utils.Out;
-import ch.fhnw.kvan.chat.gui.ClientGUI;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 

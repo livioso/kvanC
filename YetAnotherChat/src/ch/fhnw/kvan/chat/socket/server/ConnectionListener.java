@@ -1,14 +1,14 @@
 package ch.fhnw.kvan.chat.socket.server;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.util.List;
 
 /**
  * Thread responsible for listing for new clients and

@@ -3,9 +3,9 @@ package ch.fhnw.kvan.chat.socket.client;
 import ch.fhnw.kvan.chat.interfaces.IChatRoom;
 import ch.fhnw.kvan.chat.utils.Out;
 
-import java.io.IOException;
-import javax.json.JsonObject;
 import javax.json.Json;
+import javax.json.JsonObject;
+import java.io.IOException;
 
 /**
  * Responsible for sending outbound messages to the server

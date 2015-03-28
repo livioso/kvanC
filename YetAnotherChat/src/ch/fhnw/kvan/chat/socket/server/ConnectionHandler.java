@@ -3,17 +3,16 @@ package ch.fhnw.kvan.chat.socket.server;
 import ch.fhnw.kvan.chat.general.ChatRoom;
 import ch.fhnw.kvan.chat.utils.In;
 import ch.fhnw.kvan.chat.utils.Out;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.io.StringReader;
-import java.util.List;
-import javax.json.JsonReader;
-import javax.json.JsonObject;
-import javax.json.Json;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.Socket;
+import java.util.List;
 
 /**
  * ConnectionHandler is responsible for listing for
