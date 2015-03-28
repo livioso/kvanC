@@ -7,7 +7,7 @@
 
 #### Overview
 
-![Overview](assets/Communication.pdf)
+![Overview](assets/Communication.png)
 
 **Description:**
 
