@@ -17,11 +17,11 @@ The following source code files have been created in order to solve the task.
 - [ConnectionHandler.java](https://github.com/livioso/kvanC/blob/master/YetAnotherChat/src/ch/fhnw/kvan/chat/socket/server/ConnectionHandler.java)
 
 #### User Interface
-![UI](assets/Screenshot-I.png)
+![UI](figures/Screenshot-I.png)
 
 ### Overview
 
-![Overview](assets/Communication.png)
+![Overview](figures/Communication.png)
 
 **Description:**
 
@@ -32,32 +32,32 @@ The client can send the following request to the server:
 
 ###### Add New User: *Client signed in*
 	{"action":"new_user","name":"mary"}
-	
+
 ###### Remove User: *Client signed off*
 	{"action":"remove_user","name":"mary"}
-	
+
 ###### Add Topic: *Client wants to add topic*
 	{"action":"add_topic","topic":"whatever"}
-	
+
 ###### Remove Topic: *Client wants to removed topic*
 	{"action":"remove_topic","topic":"whatever"}
-	
+
 ###### Add Message: *Clients wants to add message*
 	{"action":"add_message","message":"hi","topic":"whatever"}
-	
+
 ###### Get Latest Messages: *Requesting 10 most recent messages*
 	{"action":"get_latest_messages"}
-	
+
 **Response:** *See Server Notifications - Response Latest Messages*
 
 ###### Get All Topics: *Requesting all topics*
 	`{"action":"get_all_topics"}`
-	
+
 **Response:** *See Server Notifications - Response All Topics*
 
 ###### Get All Participants: *Requesting all participants*
 	`{"action":"get_all_participants"}`
-	
+
 **Response:** *See Server Notifications -  Response All Participants*
 
 ### Server Messages
@@ -76,7 +76,7 @@ The server can send the following messages to the client (this are replies to cl
 
 ###### Removed Topic: *A topic has been removed*
 	{"action":"remove_topic","topic":"whatever"}
-	
+
 ###### Added Message: *A new message has been added*
 	{"action":"add_message","message":"hi","topic":"whatever"}
 
@@ -85,7 +85,7 @@ The server can send the following messages to the client (this are replies to cl
 
 ###### Response Latest Messages: *The client initially needs to know the latests messages*
 	{"action":"response_latest_messages","messages":"message2;message1"}
-  
+
 ###### Response All Topics: *The client initially needs to know topics*
 	{"action":"response_all_topics","topics":"topic1;topic2"}
 
