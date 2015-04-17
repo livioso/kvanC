@@ -83,7 +83,7 @@ public class Client {
     /*
      * See Client class comment for more information.
      *
-     * @param args In this order: [Hostname] [Port[4-digits]] [Username]
+     * @param args In this order: [Username] [Hostname] [Port[4-digits]]
      */
     public static void main(String[] args) {
         try {
