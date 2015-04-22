@@ -4,29 +4,48 @@ import ch.fhnw.kvan.chat.gui.ClientGUI;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 
+import java.io.IOException;
+
 public class Client {
 
 	private static Logger logger = Logger.getLogger(Client.class);
-	
-	public static void main(String[] args) throws Exception
-	{
-		String username = args[0];
-		String hostname = args[1];
-		String portnumber = args[2];
+
+	private String username;
+	private String urlServer;
+
+	private HTTPMessageSender messageSender;
+
+	public Client (String username, String urlServer) throws IOException {
+
+		this.username = username;
+		this.urlServer = urlServer;
+		this.messageSender = new HTTPMessageSender(urlServer);
 
 		logger.setLevel(Level.ALL);
 		logger.info("Username is: " + username);
-		logger.info("Hostname is: " + hostname);
-		logger.info("Port number is: " + portnumber);
+		logger.info("Server is at: " + urlServer);
 
-		if (!portnumber.matches("[1-9]{4}")) {
-			throw new Exception("Port number is expected to be 4 digit number.");
+		ClientGUI ui = new ClientGUI(messageSender, username);
+
+		doInitialUserInterfaceUpdate();
+	}
+
+	public static void main(String[] args) throws Exception
+	{
+		if (args.length != 2) {
+			throw new Exception("Expecting <host> <username> parameters.");
+		} else {
+			Client newClient = new Client(args[0], args[1]);
+
 		}
+	}
 
-
-		// make sure sockets & streams are set up at this point we depend on working streams.
-		//this.messageSender = new ClientMessageSender(outputStream, username);
-		//this.ui = new ClientGUI(messageSender, username);
-		//this.messagesReceiver = new ClientMessageReceiver(inputStream, ui);
+	/**
+	 * Announce client and update ui with existing topics and participants
+	 */
+	private void doInitialUserInterfaceUpdate() throws IOException {
+		messageSender.addParticipant(username); // announce himself
+		messageSender.getExistingTopics();
+		messageSender.getExistingParticipants();
 	}
 }
