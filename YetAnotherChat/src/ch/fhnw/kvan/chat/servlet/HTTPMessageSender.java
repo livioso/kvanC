@@ -34,9 +34,6 @@ public class HTTPMessageSender implements IChatRoom {
                    .build();
            HttpGet request = new HttpGet(uri);
            HttpResponse res = httpClient.execute(request);
-
-           System.out.println(res);
-
        } catch (URISyntaxException ex) {
 
        }
