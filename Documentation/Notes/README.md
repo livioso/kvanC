@@ -14,26 +14,24 @@
 
 - *pseudo parallelism*
 - thread decide when they ‘can’ give up time to other threads
-- **Example:** `yield(); sleep(1000)`
+- **Example:**  `yield(); sleep(1000)`
 - `yield()`: This static method is essentially used to notify the system that the current thread is willing to "give up the CPU" for a while. The [thread scheduler](http://www.javamex.com/tutorials/threads/thread_scheduling.shtml) will select a different thread to run instead of the current one.
 
 
 ##### Pre-emptive Threading
 
 - *quasi parallelism*
+  
 - OS interrupts threads at any time (time sliced)
+  
 - no thread can unfairly hog the processor
-- - [First In First Out (FIFO)](https://en.wikipedia.org/wiki/FIFO_(computing_and_electronics)
-
-
-
-
-- [Earliest deadline first scheduling (EDF)](https://en.wikipedia.org/wiki/Earliest_deadline_first_scheduling)
-- [Shortest remaining time (sim. Shortest Job First, SJF)](https://en.wikipedia.org/wiki/Shortest_remaining_time)
-- [Fixed priority pre-emptive scheduling (FPPS)](https://en.wikipedia.org/wiki/Fixed_priority_pre-emptive_scheduling)
-- [Round-robin scheduling (RR)](https://en.wikipedia.org/wiki/Round-robin_scheduling)
-
-
+  
+  - [First In First Out (FIFO)](https://en.wikipedia.org/wiki/FIFO_(computing_and_electronics)
+  - [Earliest deadline first scheduling (EDF)](https://en.wikipedia.org/wiki/Earliest_deadline_first_scheduling)
+  - [Shortest remaining time (sim. Shortest Job First, SJF)](https://en.wikipedia.org/wiki/Shortest_remaining_time)
+  - [Fixed priority pre-emptive scheduling (FPPS)](https://en.wikipedia.org/wiki/Fixed_priority_pre-emptive_scheduling)
+  - [Round-robin scheduling (RR)](https://en.wikipedia.org/wiki/Round-robin_scheduling)
+  
 
 
 #### Process
