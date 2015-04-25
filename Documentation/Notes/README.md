@@ -1,4 +1,4 @@
-## Personal notes for kvanC
+# Personal Notes kvanC
 **Author** Livio Bieri **Date** April 2015
 
 
@@ -76,3 +76,6 @@ threadTwo.join(); // same here
 - Essentially, volatile is used to indicate that a variable's value will be modified by different threads
 - The value of this variable will never be cached thread-locally: all reads and writes will go straight to main memory
 - Access to the variable acts as though it is enclosed in a synchronized block, synchronized on itself
+- Equivalent to wrapping all operations as synchronized blocks sharing the same lock object.
+- Reads and writes which *happen before* *(partial ordering)* a volatile access are visible by other threads accessing the same volatile field.
+- See also [double check locking](https://en.wikipedia.org/wiki/Double-checked_locking).
