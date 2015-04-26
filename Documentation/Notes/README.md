@@ -64,16 +64,22 @@ threadTwo.join(); // same here
 
 ### Thread Safety
 
->A class is thread safe it it behaves always in the same manner (i.e. correctly) when accessed from multiple threads, regardless of the scheduling or interleaving of the execution of these threads by the runtime environment and with no additional synchronisation on the part of the calling code.
+- A class is thread safe when it behaves always in the same manner (i.e. correctly) when accessed from multiple threads, regardless of the scheduling or interleaving of the execution of these threads by the runtime environment and with no additional synchronisation on the part of the calling code.
 
 - Stateless objects (immutable classes) do not have fields and they do not reference fields from other classes therefore they are *always* thread safe.
-- We always have thread unsafe applications when we use compounds operations like (they are not [atomic operations](https://en.wikipedia.org/wiki/Linearizability)):
-	- **Read-Modify-Write (RMW)**
-	- **Check-Then-Act (CTA)**
+
+#### Compound Operations
+
+We always have thread unsafe applications when we use compounds operations  
+*(because they are not [atomic operations](https://en.wikipedia.org/wiki/Linearizability))* such as:
+
+- Check-Then-Act (CTA)
+- [Read-Modify-Write (RMW)](https://en.wikipedia.org/wiki/Read-modify-write)
+
 
 ### Memory Model
 
-##### `volatile`
+#### `volatile`
 - Essentially, volatile is used to indicate that a variable's value will be modified by different threads
 - The value of this variable will never be cached thread-locally: all reads and writes will go straight to main memory
 - Access to the variable acts as though it is enclosed in a synchronized block, synchronized on itself
