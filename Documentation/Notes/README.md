@@ -1,6 +1,7 @@
 # Personal Notes kvanC
 **Author** Livio Bieri **Date** April 2015
 
+## Threading
 
 ### Process
 
@@ -79,3 +80,41 @@ threadTwo.join(); // same here
 - Equivalent to wrapping all operations as synchronized blocks sharing the same lock object.
 - Reads and writes which *happen before* *(partial ordering)* a volatile access are visible by other threads accessing the same volatile field.
 - See also [double check locking](https://en.wikipedia.org/wiki/Double-checked_locking).
+
+## Networking
+
+### Sockets
+
+#### Datagram Sockets
+- Use **User Datagram Protocol (UDP)** as protocol.
+- Not connection oriented, not reliable.
+
+#### Stream Sockets
+
+- Use **Transmission Control Protocol (TCP)** as end to end protocol.
+- Provide a [reliable](https://en.wikipedia.org/wiki/Transmission_Control_Protocol#Reliable_transmission) **byte-stream**.
+- **Connection oriented:** Socket represents one end of a TCP connection.
+
+##### TCP 
+
+- Packages are delivered in right order.
+- Lost packages are retransmitted.
+- Connection is **full duplex**.
+
+##### `java.net.Socket`
+
+- `Socket(String host, int port, InetAdress localAddr, int localport)`
+- `TCP_NODELAY`: `setTcpNoDelay()` Sends the packets as quickly as possible, normally small packets are combined with larger packets before sent.
+
+##### `java.net.ServerSocket`
+
+- `ServerSocket(int port)`
+- `.accept()` blocks until a connection is requested.
+- `￼￼.setSoTimeout(int ms)` timeout for accept.
+
+### Hypertext Transfer Protocol (HTTP)
+
+- **Stateless** protocol.
+- Request: `GET /web/index.html HTTP/1.1` `<header>`
+- Response: `HTTP/1.0 200 OK` `<message>`
+- `HEAD` same as `GET` without body (getting metadata). 
