@@ -137,3 +137,14 @@ We always have thread unsafe applications when we use compounds operations
 - Request: `GET /web/index.html HTTP/1.1` `<header>`
 - Response: `HTTP/1.0 200 OK` `<message>`
 - `HEAD` same as `GET` without body (getting metadata). 
+
+#### POST
+
+- POST requests are never cached.
+- POST requests have no restrictions on data length.
+
+#### GET
+
+- GET requests can be cached.
+- GET requests should be used only to retrieve data.
+- GET requests have length restrictions.
