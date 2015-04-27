@@ -27,7 +27,8 @@ A process is an executing program that:
 - *pseudo parallelism*
 - thread decide when they ‘can’ give up time to other threads
 - **Example:** `yield(); sleep(1000);`
-	- `yield()` *is essentially used to notify the system that the current thread is willing to give up the CPU for a while. The [thread scheduler](http://www.javamex.com/tutorials/threads/thread_scheduling.shtml) will select a different thread to run instead of the current one.*
+
+**Note:** `yield()` *is essentially used to notify the system that the current thread is willing to give up the CPU for a while. The [thread scheduler](http://www.javamex.com/tutorials/threads/thread_scheduling.shtml) will select a different thread to run instead of the current one.*
 
 #### Pre-emptive Scheduling
 - *quasi parallelism*
@@ -101,11 +102,23 @@ We always have thread unsafe applications when we use compounds operations
 - Provide a [reliable](https://en.wikipedia.org/wiki/Transmission_Control_Protocol#Reliable_transmission) **byte-stream**.
 - **Connection oriented:** Socket represents one end of a TCP connection.
 
-##### TCP 
+##### TCP
 
 - Packages are delivered in right order.
 - Lost packages are retransmitted.
 - Connection is **full duplex**.
+- **3-Way-Handshake:** *SYN, SYN_ACK, ACK*
+
+###### DDoS TCP
+
+- Keep sending SYN without acknowledging them (ACK).
+- Server gets unresponsive due to many half open connections.
+
+*This attack can be prevented by:*
+
+- Filtering
+- Reducing the SYN_RECIEVED timer
+- Firewall, Proxies
 
 ##### `java.net.Socket`
 
