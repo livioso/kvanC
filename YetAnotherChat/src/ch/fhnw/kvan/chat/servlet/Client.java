@@ -13,19 +13,21 @@ public class Client {
 	private String username;
 	private String urlServer;
 
-	private HTTPMessageSender messageSender;
+	private ClientMessageSender messageSender;
 
 	public Client (String username, String urlServer) throws IOException {
 
 		this.username = username;
 		this.urlServer = urlServer;
-		this.messageSender = new HTTPMessageSender(urlServer);
+		this.messageSender = new ClientMessageSender(urlServer);
 
 		logger.setLevel(Level.ALL);
 		logger.info("Username is: " + username);
 		logger.info("Server is at: " + urlServer);
 
 		ClientGUI ui = new ClientGUI(messageSender, username);
+		ui.show();
+
 
 		doInitialUserInterfaceUpdate();
 	}

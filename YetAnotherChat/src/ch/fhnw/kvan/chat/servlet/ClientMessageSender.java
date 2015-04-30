@@ -6,18 +6,19 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.HttpResponse;
 
-public class HTTPMessageSender implements IChatRoom {
+public class ClientMessageSender implements IChatRoom {
 
     String host;
-
     HttpClient httpClient = new DefaultHttpClient();
 
-    public HTTPMessageSender(String host) {
+    public ClientMessageSender (String host) {
         this.host = host;
     }
 
@@ -28,16 +29,12 @@ public class HTTPMessageSender implements IChatRoom {
            URI uri = new URIBuilder()
                    .setScheme("http")
                    .setHost(host)
-                   .setPath("/api/user")
-                   .setParameter("action", "new_user")
-                   .setParameter("name", name)
+                   .setPath("/chatserver/api/v1/user")
+                   .setParameter("username", "name")
                    .build();
-           HttpGet request = new HttpGet(uri);
+           HttpPost request = new HttpPost(uri);
            HttpResponse res = httpClient.execute(request);
-       } catch (URISyntaxException ex) {
-
-       }
-
+       } catch (URISyntaxException ex) {}
         return false;
     }
 
@@ -68,10 +65,22 @@ public class HTTPMessageSender implements IChatRoom {
 
     @Override
     public String refresh(String topic) throws IOException {
-        return null;
+        getExistingParticipants();
+        getExistingTopics();
+        return "";
     }
 
     public void getExistingTopics() {
+        try {
+            URI uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(host)
+                    .setPath("/chatserver/api/v1/user")
+                    .setParameter("username", "name")
+                    .build();
+            HttpPost request = new HttpPost(uri);
+            HttpResponse res = httpClient.execute(request);
+        } catch (Exception ex) {}
     }
 
     public void getExistingParticipants() {
