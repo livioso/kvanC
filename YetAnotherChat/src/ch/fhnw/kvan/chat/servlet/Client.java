@@ -11,15 +11,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
 
-import javax.print.URIException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public class Client implements IChatRoom {
 
-	private final String username;
-	private final String host;
+    private final String username;
+    private final String host;
     private final ClientGUI ui;
 
     // base uri which can use for further
@@ -30,10 +29,10 @@ public class Client implements IChatRoom {
     // HTTP client used to make the calls
     private final HttpClient httpClient;
 
-	public Client (String username, String host) throws IOException, URISyntaxException {
-		this.username = username;
-		this.host = host;
-		this.ui = new ClientGUI(this, username);
+    public Client(String username, String host) throws IOException, URISyntaxException {
+        this.username = username;
+        this.host = host;
+        this.ui = new ClientGUI(this, username);
         this.baseUri = new URIBuilder()
                 .setScheme("http")
                 .setHost(host)
@@ -41,28 +40,27 @@ public class Client implements IChatRoom {
         this.httpClient = HttpClientBuilder.create().build();
 
         doInitialUserInterfaceUpdate();
-	}
+    }
 
-	public static void main(String[] args) throws Exception
-	{
-		if (args.length != 2) {
-			throw new Exception("Expecting <host> <username> parameters.");
-		} else {
-			new Client(args[0], args[1]);
-		}
-	}
+    public static void main(String[] args) throws Exception {
+        if (args.length != 2) {
+            throw new Exception("Expecting <host> <username> parameters.");
+        } else {
+            new Client(args[0], args[1]);
+        }
+    }
 
-	/**
-	 * Announce client and update ui with existing topics and participants
-	 */
-	private void doInitialUserInterfaceUpdate() throws IOException {
+    /**
+     * Announce client and update ui with existing topics and participants
+     */
+    private void doInitialUserInterfaceUpdate() throws IOException {
         addParticipant(username); // announce himself
-		getExistingTopics();
-		getExistingParticipants();
-	}
+        getExistingTopics();
+        getExistingParticipants();
+    }
 
     @Override
-    public boolean addParticipant(String name) throws IOException{
+    public boolean addParticipant(String name) throws IOException {
         try {
             URI uri = new URIBuilder(baseUri)
                     .setPath("/chatserver/api/v1/participant")
@@ -71,7 +69,9 @@ public class Client implements IChatRoom {
             HttpPost request = new HttpPost(uri);
             HttpResponse response = httpClient.execute(request);
             EntityUtils.consume(response.getEntity());
-        } catch (URISyntaxException ex) {}
+        } catch (URISyntaxException ex) {
+            ex.printStackTrace();
+        }
         return false;
     }
 
@@ -85,7 +85,9 @@ public class Client implements IChatRoom {
             HttpDelete request = new HttpDelete(uri);
             HttpResponse response = httpClient.execute(request);
             EntityUtils.consume(response.getEntity());
-        } catch (URISyntaxException ex) {}
+        } catch (URISyntaxException ex) {
+            ex.printStackTrace();
+        }
         return false;
     }
 
@@ -99,7 +101,9 @@ public class Client implements IChatRoom {
             HttpPost request = new HttpPost(uri);
             HttpResponse response = httpClient.execute(request);
             EntityUtils.consume(response.getEntity());
-        } catch (URISyntaxException ex) {}
+        } catch (URISyntaxException ex) {
+            ex.printStackTrace();
+        }
         return false;
     }
 
@@ -113,7 +117,9 @@ public class Client implements IChatRoom {
             HttpDelete request = new HttpDelete(uri);
             HttpResponse response = httpClient.execute(request);
             EntityUtils.consume(response.getEntity());
-        } catch (URISyntaxException ex) {}
+        } catch (URISyntaxException ex) {
+            ex.printStackTrace();
+        }
         return false;
     }
 
@@ -128,7 +134,9 @@ public class Client implements IChatRoom {
             HttpPost request = new HttpPost(uri);
             HttpResponse response = httpClient.execute(request);
             EntityUtils.consume(response.getEntity());
-        } catch (URISyntaxException ex) {}
+        } catch (URISyntaxException ex) {
+            ex.printStackTrace();
+        }
         return false;
     }
 
@@ -145,7 +153,7 @@ public class Client implements IChatRoom {
             messages = EntityUtils.toString(response.getEntity(), "US-ASCII");
             EntityUtils.consume(response.getEntity());
         } catch (URISyntaxException ex) {
-           ex.printStackTrace();
+            ex.printStackTrace();
         } finally {
             ui.updateMessages(messages.split(";;"));
         }
@@ -174,8 +182,7 @@ public class Client implements IChatRoom {
             EntityUtils.consume(response.getEntity());
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
-        }
-        finally {
+        } finally {
             ui.updateTopics(topics.split(";"));
         }
     }
