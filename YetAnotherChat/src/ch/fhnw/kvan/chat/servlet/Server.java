@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 
 public abstract class Server {
 
+    // chatroom singleton which holds the current state
     private static ChatRoom theChatRoom = ChatRoom.getInstance();
 
     // Controller responsible for handling participants:
@@ -21,6 +22,7 @@ public abstract class Server {
 
         public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
             final String username = req.getParameter("username");
+
             if (username != null) {
                 theChatRoom.addParticipant(username);
                 res.setStatus(200);
@@ -31,6 +33,7 @@ public abstract class Server {
 
         public void doDelete(HttpServletRequest req, HttpServletResponse res) throws IOException {
             final String username = req.getParameter("username");
+
             if (username != null) {
                 theChatRoom.removeParticipant(username);
                 res.setStatus(200);
@@ -49,6 +52,7 @@ public abstract class Server {
             if (!participants.isEmpty()) {
                 participants = participants.substring(0, participants.length() - 1);
             }
+
             out.println(participants);
             out.close();
         }
@@ -63,6 +67,7 @@ public abstract class Server {
 
         public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
             final String topic = req.getParameter("name");
+
             if (topic != null) {
                 theChatRoom.addTopic(topic);
                 res.setStatus(200);
@@ -73,6 +78,7 @@ public abstract class Server {
 
         public void doDelete(HttpServletRequest req, HttpServletResponse res) throws IOException {
             final String topic = req.getParameter("name");
+
             if (topic != null) {
                 theChatRoom.removeTopic(topic);
                 res.setStatus(200);
@@ -83,7 +89,13 @@ public abstract class Server {
 
         public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
             PrintWriter out = res.getWriter();
-            out.println(theChatRoom.getTopics());
+            String topics = theChatRoom.getTopics();
+            topics = topics.replaceFirst("topics=", "");
+
+            // there is a trailing ; at the very end of the string => not needed
+            topics = topics.substring(0, topics.length() - 1);
+
+            out.println(topics);
             out.close();
         }
     }
@@ -97,6 +109,7 @@ public abstract class Server {
         public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
             final String topic = req.getParameter("topic");
             final String message = req.getParameter("message");
+
             if (topic != null && message != null) {
                 theChatRoom.addMessage(topic, message);
                 res.setStatus(200);
@@ -107,6 +120,7 @@ public abstract class Server {
 
         public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
             final String topic = req.getParameter("topic");
+
             if(topic != null) {
                 PrintWriter out = res.getWriter();
                 out.println(theChatRoom.getMessages(topic));
