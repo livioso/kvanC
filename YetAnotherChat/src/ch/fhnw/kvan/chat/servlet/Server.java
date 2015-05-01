@@ -10,11 +10,11 @@ import javax.servlet.ServletException;
 
 
 
-public class Server {
+public abstract class Server {
 
     private static ChatRoom theChatRoom = ChatRoom.getInstance();
 
-    @WebServlet("/chatserver/api/v1/user")
+    @WebServlet("/chatserver/api/v1/participant")
     public static class ChatServerParticipantController extends HttpServlet {
 
         public void doPost(HttpServletRequest req, HttpServletResponse res)
@@ -23,6 +23,18 @@ public class Server {
             final String username = req.getParameter("username");
             if (username != null) {
                 theChatRoom.addParticipant(username);
+                res.setStatus(200);
+            } else {
+                res.sendError(400);
+            }
+        }
+
+        public void doDelete(HttpServletRequest req, HttpServletResponse res)
+                throws ServletException, IOException {
+
+            final String username = req.getParameter("username");
+            if (username != null) {
+                theChatRoom.removeParticipant(username);
                 res.setStatus(200);
             } else {
                 res.sendError(400);
