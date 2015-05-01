@@ -48,4 +48,4 @@ crashlytics.properties
 crashlytics-build.properties
 
 # Generated class files for Tomcat
-web/WEB-INF/classes/
+web/
