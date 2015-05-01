@@ -2,9 +2,7 @@ package ch.fhnw.kvan.chat.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import ch.fhnw.kvan.chat.general.ChatRoom;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,7 +10,7 @@ import javax.servlet.annotation.WebServlet;
 
 public abstract class Server {
 
-    // chatroom singleton which holds the current state
+    // chat room singleton which holds the current state
     private static ChatRoom theChatRoom = ChatRoom.getInstance();
 
     // Controller responsible for handling participants:
