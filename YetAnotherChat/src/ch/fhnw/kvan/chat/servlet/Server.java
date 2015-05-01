@@ -41,7 +41,15 @@ public abstract class Server {
 
         public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
             PrintWriter out = res.getWriter();
-            out.println(theChatRoom.getParticipants());
+
+            String participants = theChatRoom.getParticipants();
+            participants = participants.replaceFirst("participants=", "");
+
+            // there is a trailing ; at the very end of the string => not needed
+            if (!participants.isEmpty()) {
+                participants = participants.substring(0, participants.length() - 1);
+            }
+            out.println(participants);
             out.close();
         }
     }
