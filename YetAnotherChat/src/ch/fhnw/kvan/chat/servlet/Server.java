@@ -93,7 +93,9 @@ public abstract class Server {
             topics = topics.replaceFirst("topics=", "");
 
             // there is a trailing ; at the very end of the string => not needed
-            topics = topics.substring(0, topics.length() - 1);
+            if (!topics.isEmpty()) {
+                topics.substring(0, topics.length() - 2);
+            }
 
             out.println(topics);
             out.close();
@@ -123,7 +125,15 @@ public abstract class Server {
 
             if(topic != null) {
                 PrintWriter out = res.getWriter();
-                out.println(theChatRoom.getMessages(topic));
+                String messages = theChatRoom.getMessages(topic);
+                messages = messages.replaceFirst("messages=", "");
+
+                // there is a trailing ; at the very end of the string => not needed
+                if (!messages.isEmpty()) {
+                    messages.substring(0, messages.length() - 2);
+                }
+
+                out.println(messages);
                 out.close();
             } else {
                 res.sendError(400);
