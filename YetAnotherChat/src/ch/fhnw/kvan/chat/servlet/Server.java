@@ -2,7 +2,9 @@ package ch.fhnw.kvan.chat.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import ch.fhnw.kvan.chat.general.ChatRoom;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -123,7 +125,7 @@ public abstract class Server {
         public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
             final String topic = req.getParameter("topic");
 
-            if(topic != null) {
+            if (topic != null) {
                 PrintWriter out = res.getWriter();
                 String messages = theChatRoom.getMessages(topic);
                 messages = messages.replaceFirst("messages=", "");
