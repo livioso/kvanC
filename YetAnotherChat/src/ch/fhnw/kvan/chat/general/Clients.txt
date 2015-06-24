@@ -10,4 +10,7 @@ ch.fhnw.kvan.chat.servlet.Client localhost:8080/ mary
 -
 ch.fhnw.kvan.chat.servlet.Client localhost:8081/chat/Server peter
 -
-
+ch.fhnw.kvan.chat.rest.Client localhost:9998/chat/chatRoom alice
+ch.fhnw.kvan.chat.rest.Client localhost:9998/chat/chatRoom john
+ch.fhnw.kvan.chat.rest.Client localhost:9998/chat/chatRoom bob
+-
