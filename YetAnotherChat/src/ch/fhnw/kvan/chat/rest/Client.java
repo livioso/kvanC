@@ -3,6 +3,10 @@ package ch.fhnw.kvan.chat.rest;
 import ch.fhnw.kvan.chat.gui.ClientGUI;
 import ch.fhnw.kvan.chat.interfaces.IChatRoom;
 
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -12,26 +16,25 @@ import java.net.URISyntaxException;
 public class Client implements IChatRoom {
 
     private final String username;
-    private final String host;
     private final ClientGUI ui;
-
-    // base uri which can use for further
-    // specification of the REST api call
-    // http://localhost:8080/
+    private final javax.ws.rs.client.Client client;
     private final String baseUri;
+    private WebTarget target;
 
-    public Client(String username, String host) throws IOException, URISyntaxException {
+    public Client(String username, String baseUri) throws IOException, URISyntaxException {
+
         this.username = username;
-        this.host = host;
         this.ui = new ClientGUI(this, username);
-        this.baseUri = "";
+        this.client = ClientBuilder.newClient();
+        this.baseUri = baseUri;
 
         doInitialUserInterfaceUpdate();
     }
 
     public static void main(String[] args) throws Exception {
+
         if (args.length != 2) {
-            throw new Exception("Expecting <host> <username> parameters.");
+            throw new Exception("Expecting <baseuri> <username> parameters.");
         } else {
             new Client(args[0], args[1]);
         }
@@ -48,6 +51,8 @@ public class Client implements IChatRoom {
 
     @Override
     public boolean addParticipant(String name) throws IOException {
+        target = client.target("http://" + baseUri + "/users/" + name);
+        target.request().put(Entity.entity("", MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         return false;
     }
 
