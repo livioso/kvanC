@@ -51,8 +51,8 @@ public class ChatRoomResource {
 
     @POST
     @Path("/messages/{topicName}")
-    public void addMessage(@PathParam("topicName") String topicName) throws IOException {
-        theChatRoom.addMessage(topicName, "Yo");
+    public void addMessage(@PathParam("topicName") String topicName, @FormParam("message") String message) throws IOException {
+        theChatRoom.addMessage(topicName, message);
     }
 
     @GET
