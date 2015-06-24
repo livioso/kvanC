@@ -61,7 +61,7 @@ public class StartClient {
 				meth.invoke(null, (Object) params);
 			}
 			// communication via servlet: package name contains "servlet"
-			else if (args[0].contains("servlet")) {
+			else if (args[0].contains("servlet") || args[0].contains("rest")) {
 				// prepare right parameters
 				String[] params = {args[2], args[1]}; 
 				// invoke main()
