@@ -79,12 +79,16 @@ public class Client implements IChatRoom {
 
     @Override
     public boolean addMessage(String topic, String message) throws IOException {
+        target = client.target("http://" + baseUri + "/topics/" + topic);
+        target.request().post(Entity.entity("", MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         return false;
     }
 
     @Override
     public String getMessages(String topic) throws IOException {
-        return null;
+        target = client.target("http://" + baseUri + "/topics/" + topic);
+        target.request().post(Entity.entity("", MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        return "";
     }
 
     @Override

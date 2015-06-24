@@ -44,8 +44,20 @@ public class ChatRoomResource {
     }
 
     @DELETE
-    @Path("/users/{topicName}")
+    @Path("/topics/{topicName}")
     public void removeTopic(@PathParam("topicName") String topicName) throws IOException {
-        theChatRoom.removeParticipant(topicName);
+        theChatRoom.removeTopic(topicName);
+    }
+
+    @POST
+    @Path("/messages/{topicName}")
+    public void addMessage(@PathParam("topicName") String topicName) throws IOException {
+        theChatRoom.addMessage(topicName, "Yo");
+    }
+
+    @GET
+    @Path("/messages/{topicName}")
+    public String getMessages(@PathParam("topicName") String topicName) throws IOException {
+        return theChatRoom.getMessages(topicName);
     }
 }
