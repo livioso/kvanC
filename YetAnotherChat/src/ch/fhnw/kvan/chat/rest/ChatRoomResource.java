@@ -30,5 +30,22 @@ public class ChatRoomResource {
         theChatRoom.removeParticipant(username);
     }
 
+    @GET
+    @Path("/topics")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getTopics() throws IOException {
+        return theChatRoom.getTopics().toString();
+    }
 
+    @PUT
+    @Path("/topics/{topicName}")
+    public void addTopic(@PathParam("topicName") String topicName) throws IOException {
+        theChatRoom.addTopic(topicName);
+    }
+
+    @DELETE
+    @Path("/users/{topicName}")
+    public void removeTopic(@PathParam("topicName") String topicName) throws IOException {
+        theChatRoom.removeParticipant(topicName);
+    }
 }

@@ -58,16 +58,22 @@ public class Client implements IChatRoom {
 
     @Override
     public boolean removeParticipant(String name) throws IOException {
+        target = client.target("http://" + baseUri + "/users/" + name);
+        target.request().delete();
         return false;
     }
 
     @Override
     public boolean addTopic(String topic) throws IOException {
+        target = client.target("http://" + baseUri + "/topics/" + topic);
+        target.request().put(Entity.entity("", MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         return false;
     }
 
     @Override
     public boolean removeTopic(String topic) throws IOException {
+        target = client.target("http://" + baseUri + "/topics/" + topic);
+        target.request().delete();
         return false;
     }
 
