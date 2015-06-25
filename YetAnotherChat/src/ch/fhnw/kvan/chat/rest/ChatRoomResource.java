@@ -67,12 +67,14 @@ public class ChatRoomResource {
 
     @POST
     @Path("/messages/{topicName}")
+    @Consumes("application/x-www-form-urlencoded")
     public void addMessage(@PathParam("topicName") String topicName, @FormParam("message") String message) throws IOException {
         theChatRoom.addMessage(topicName, message);
     }
 
     @GET
     @Path("/messages/{topicName}")
+    @Produces(MediaType.TEXT_PLAIN)
     public String getMessages(@PathParam("topicName") String topicName) throws IOException {
 
         String messages = theChatRoom.getMessages(topicName);
