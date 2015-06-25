@@ -15,7 +15,15 @@ public class ChatRoomResource {
     @Path("/users")
     @Produces(MediaType.TEXT_PLAIN)
     public String getUsers() throws IOException {
-        return theChatRoom.getParticipants().toString();
+        String users = theChatRoom.getParticipants();
+        users = users.replaceFirst("participants=", "");
+
+        // there is a trailing ; at the very end of the string => not needed
+        if (!users.isEmpty()) {
+            users.substring(0, users.length() - 1);
+        }
+
+        return users;
     }
 
     @PUT
@@ -34,7 +42,15 @@ public class ChatRoomResource {
     @Path("/topics")
     @Produces(MediaType.TEXT_PLAIN)
     public String getTopics() throws IOException {
-        return theChatRoom.getTopics().toString();
+        String topics = theChatRoom.getTopics().toString();
+
+        topics = topics.replaceFirst("topics=", "");
+        // there is a trailing ; at the very end of the string => not needed
+        if (!topics.isEmpty()) {
+            topics.substring(0, topics.length() - 2);
+        }
+
+        return topics;
     }
 
     @PUT
@@ -58,6 +74,15 @@ public class ChatRoomResource {
     @GET
     @Path("/messages/{topicName}")
     public String getMessages(@PathParam("topicName") String topicName) throws IOException {
-        return theChatRoom.getMessages(topicName);
+
+        String messages = theChatRoom.getMessages(topicName);
+        messages = messages.replaceFirst("messages=", "");
+
+        // there is a trailing ; at the very end of the string => not needed
+        if (!messages.isEmpty()) {
+            messages.substring(0, messages.length() - 2);
+        }
+
+        return messages;
     }
 }

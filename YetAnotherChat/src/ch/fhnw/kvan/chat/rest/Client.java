@@ -2,11 +2,14 @@ package ch.fhnw.kvan.chat.rest;
 
 import ch.fhnw.kvan.chat.gui.ClientGUI;
 import ch.fhnw.kvan.chat.interfaces.IChatRoom;
+import org.glassfish.jersey.client.ClientResponse;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -80,21 +83,30 @@ public class Client implements IChatRoom {
 
     @Override
     public boolean addMessage(String topic, String message) throws IOException {
-        target = client.target("http://" + baseUri + "/topics/" + topic);
-        target.request().post(Entity.entity("", MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        target = client.target("http://" + baseUri + "/messages/" + topic);
+        MultivaluedMap<String, String> formData = new MultivaluedHashMap<>();
+        formData.add("message", message);
+        target.request().post(Entity.entity(formData, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+
+        getMessages(topic);
         return false;
     }
 
     @Override
     public String getMessages(String topic) throws IOException {
-        target = client.target("http://" + baseUri + "/topics/" + topic);
-        target.request().post(Entity.entity("", MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        target = client.target("http://" + baseUri + "/messages/" + topic);
+        Response res = target.request().get();
+        String[] messages = res.readEntity(String.class).split(";");
+        ui.updateMessages(messages);
         return "";
     }
 
     @Override
     public String refresh(String topic) throws IOException {
-        return null;
+        getExistingTopics();
+        getExistingParticipants();
+        getMessages(topic);
+        return "";
     }
 
     public void getExistingTopics() {
@@ -105,6 +117,9 @@ public class Client implements IChatRoom {
     }
 
     public void getExistingParticipants() {
-
+        target = client.target("http://" + baseUri + "/users/");
+        Response res = target.request().get();
+        String[] users = res.readEntity(String.class).split(";");
+        ui.updateParticipants(users);
     }
 }
