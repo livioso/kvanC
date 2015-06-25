@@ -7,6 +7,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -97,7 +98,10 @@ public class Client implements IChatRoom {
     }
 
     public void getExistingTopics() {
-
+        target = client.target("http://" + baseUri + "/topics/");
+        Response res = target.request().get();
+        String[] topics = res.readEntity(String.class).split(";");
+        ui.updateTopics(topics);
     }
 
     public void getExistingParticipants() {
