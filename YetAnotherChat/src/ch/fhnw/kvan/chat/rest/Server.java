@@ -11,8 +11,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Server extends Application {
-    private final Set<Object> singletons = new HashSet<Object>();
-    private final Set<Class<?>> empty = new HashSet<Class<?>>();
+    private final Set<Object> singletons = new HashSet<>();
+    private final Set<Class<?>> empty = new HashSet<>();
 
     public Server() {
         singletons.add(new ChatRoomResource());
@@ -37,11 +37,6 @@ public class Server extends Application {
 
         System.out.println("Starting Grizzly...");
         HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUri), rc);
-
-        System.out.println(String.format(
-                "Jersey app started with WADL available at " +
-                        "%sapplication.wadl\nTry out %s\nHit enter to stop it...",
-                baseUri, baseUri));
 
         System.in.read();
         httpServer.shutdown();

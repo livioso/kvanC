@@ -2,8 +2,6 @@ package ch.fhnw.kvan.chat.rest;
 
 import ch.fhnw.kvan.chat.gui.ClientGUI;
 import ch.fhnw.kvan.chat.interfaces.IChatRoom;
-import org.glassfish.jersey.client.ClientResponse;
-
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
